@@ -1,133 +1,127 @@
 //-----------------------------------------------------------------------------
-// Queue.h
-// Header file for Queue ADT
+// List.h
+// Header file for List ADT
 //-----------------------------------------------------------------------------
-#ifndef QUEUE_H_INCLUDE_
-#define QUEUE_H_INCLUDE_
+#ifndef LIST_H_INCLUDE_
+#define LIST_H_INCLUDE_
 #include <stdbool.h>
 
-#define FORMAT "%d"  // format string for QueueElement
+#define FORMAT "%d"  // format string for ListElement
 
 
 // Exported types -------------------------------------------------------------
-typedef int QueueElement;
-typedef struct QueueObj* Queue;
+typedef int ListElement;
+typedef struct ListObj* List;
 
 
 // Constructors-Destructors ---------------------------------------------------
 
-// newQueue()
-// Returns reference to new empty Queue object. 
-Queue newQueue();
+// newList()
+// Returns reference to new empty List object. 
+List newList();
 
-// freeQueue()
-// Frees all heap memory associated with Queue *pQ, and sets *pQ to NULL.
-void freeQueue(Queue* pQ);
-
-
-// Access functions -----------------------------------------------------------
-
-// getFront()
-// Returns the value at the front of Q.
-// Pre: !isEmpty(Q)
-QueueElement getFront(Queue Q);
-
-// getLength()
-// Returns the length of Q.
-int getLength(Queue Q);
-
-// isEmpty()
-// Returns true if Q is empty, otherwise returns false.
-bool isEmpty(Queue Q);
-
-
-// Manipulation procedures ----------------------------------------------------
-
-// Enqueue()
-// Places new data at the back of Q.
-void Enqueue(Queue Q, QueueElement data);
-
-// Dequeue()
-// Deletes data at front of Q.
-// Pre: !isEmpty(Q)
-void Dequeue(Queue Q);
-
-
-// Other Functions ------------------------------------------------------------
-
-// printQueue()
-// Prints a string representation of Q consisting of a space separated list 
-// of ints to stdout.
-void printQueue(Queue Q);
-
-// equals()
-// Returns true if A is same int sequence as B, false otherwise.
-bool equals(Queue A, Queue B);
-
-#endif//-----------------------------------------------------------------------------
-// Queue.h
-// Header file for Queue ADT
-//-----------------------------------------------------------------------------
-#ifndef QUEUE_H_INCLUDE_
-#define QUEUE_H_INCLUDE_
-#include<stdbool.h>
-
-#define FORMAT "%d"  // format string for QueueElement
-
-
-// Exported types -------------------------------------------------------------
-typedef int QueueElement;
-typedef struct QueueObj* Queue;
-
-
-// Constructors-Destructors ---------------------------------------------------
-
-// newQueue()
-// Returns reference to new empty Queue object. 
-Queue newQueue();
-
-// freeQueue()
-// Frees all heap memory associated with Queue *pQ, and sets *pQ to NULL.
-void freeQueue(Queue* pQ);
+// freeList()
+// Frees all heap memory associated with List *pL, and sets *pL to NULL.
+void freeList(List* pL);
 
 
 // Access functions -----------------------------------------------------------
 
-// getFront()
-// Returns the value at the front of Q.
-// Pre: !isEmpty(Q)
-QueueElement getFront(Queue Q);
+// Returns number of elements in L
+int length(List L);
 
-// getLength()
-// Returns the length of Q.
-int getLength(Queue Q);
+// Returns index of cursor element if defined, -1 otherwise.
+int index(List L);
 
-// isEmpty()
-// Returns true if Q is empty, otherwise returns false.
-bool isEmpty(Queue Q);
+// Returns front element of L
+// Pre: Length > 0
+ListElement front(List L);
 
+// Returns back element of L
+// Pre Length > 0
+ListElement back(List L);
+
+// Returns element at cursor of L
+// Pre: Length > 0, index >= 0
+ListElement get(List L);
+
+// Returns true iff Lists A and B are in same state and false otherwise
+bool equals(List A, List B);
 
 // Manipulation procedures ----------------------------------------------------
 
-// Enqueue()
-// Places new data at the back of Q.
-void Enqueue(Queue Q, QueueElement data);
+// Resets L to empty state
+void clear();
 
-// Dequeue()
-// Deletes data at front of Q.
-// Pre: !isEmpty(Q)
-void Dequeue(Queue Q);
+// Overwrites the cursor element’s data with x.
+// Pre: length()>0, index()>=0 
+void set(List L, int x); // MUST CHANGE if data type changes
+
+// If L is non-empty, sets cursor under the front element,                          
+// otherwise does nothing.
+void moveFront(List L);
+
+// If L is non-empty, sets cursor under the back element,                          
+// otherwise does nothing. 
+void moveBack(List L);
+
+// If cursor is defined and not at front, move cursor one                           
+// step toward the front of L; if cursor is defined and at                           
+// front, cursor becomes undefined; if cursor is undefined                           
+// do nothing
+void movePrev(List L);
+
+// If cursor is defined and not at back, move cursor one                           
+// step toward the back of L; if cursor is defined and at                           
+// back, cursor becomes undefined; if cursor is undefined                           
+// do nothing  
+void moveNext(List L);
+
+// Insert new element into L.  If L is non-empty,                               
+// insertion takes place before front element. 
+void prepend(List L, int x);
+
+// Insert new element into L.  If L is non-empty,                               
+// insertion takes place after back element.
+void append(List L, int x);
+
+// Insert new element before cursor.                                     
+// Pre: length()>0, index()>=0 
+void insertBefore(List L, int x);
+
+// Insert new element after cursor.                                     
+// Pre: length()>0, index()>=0
+void insertAfter(List L, int x);
+
+// Delete the front element. Pre: length()>0
+void deleteFront(List L);
+
+// Delete the back element. Pre: length()>0
+void deleteBack(List L);
+
+// Delete cursor element, making cursor undefined. 
+// Pre: length()>0, index()>=0 
+void delete(List L); //?? dont know why its a keyword here
 
 
 // Other Functions ------------------------------------------------------------
 
-// printQueue()
-// Prints a string representation of Q consisting of a space separated list 
-// of ints to stdout.
-void printQueue(Queue Q);
+// Prints to the file pointed to by out, a                                      
+// string representation of L consisting                                      
+// of a space separated sequence of integers,                                     
+// with front on left.
+void printList(FILE* out, List L);
 
-// equals()
-// Returns true if A is same int sequence as B, false otherwise.
-bool equals(Queue A, Queue B);
+// Returns a new List representing the same integer                          
+// sequence as L. The cursor in the new list is undefined,                         
+// regardless of the state of the cursor in L. The state                          
+// of L is unchanged.
+List copyList(List L);
+
+// Returns a new List which is the concatenation of                                    
+// A and B.  The cursor in the new List is undefined,                                    
+// regardless of the states of the cursors in A and B.                                   
+// The states of A and B are unchanged. 
+List concatList(List A, List B);
 
 #endif

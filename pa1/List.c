@@ -1,72 +1,76 @@
 //-----------------------------------------------------------------------------
-// Queue.c
-// Implementation file for Queue ADT
+// List.c
+// Implementation file for List ADT
 //-----------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
-#include "Queue.h"
+#include "List.h"
 
-// private structs, functions and constants -----------------------------------
+// structs --------------------------------------------------------------------
 
-// InitialSize
-static const int InitialSize = 10;
+// private Node type
+typedef struct NodeObj* Node;
 
-// QueueObj
-typedef struct QueueObj{
-   QueueElement* item;  // array of Queue items
-   int physicalSize;    // current length of underlying array
-   int length;          // number of items in this Queue
-   int cursor;		// cursor
-   int front;           // index of front element
-   int back;            // index of back element
-} QueueObj;
+// private NodeObj type
+typedef struct NodeObj{
+   ListElement data;
+   Node next;
+   Node prev;
+   int index;
+} NodeObj;
 
-// doubleItemArray
-// Doubles the physical size of the underlying array Q->item.
-void doubleItemArray(Queue Q){
-   int i;
-   int newSize = 2*(Q->physicalSize);
-   QueueElement* oldArray = Q->item;
-   QueueElement* newArray = calloc(newSize, sizeof(QueueElement));
-   assert( newArray!=NULL );
-
-   for(i=0; i<Q->length; i++){
-      newArray[i] = oldArray[(Q->front+i)%(Q->physicalSize)];
-   }
-   free(oldArray);
-
-   Q->item = newArray;
-   Q->physicalSize = newSize;
-   Q->front = 0;
-   Q->back = Q->length-1;
-}
+// private QueueObj type
+typedef struct ListObj{
+   Node front;
+   Node back;
+   int cursor;
+   int length;
+} ListObj;
 
 
 // Constructors-Destructors ---------------------------------------------------
 
-// newQueue()
-// Returns reference to new empty Queue object.
-Queue newQueue(){
-   Queue Q;
-   Q = malloc(sizeof(QueueObj));
-   assert( Q!=NULL );
-   Q->item = calloc(InitialSize, sizeof(QueueElement));
-   assert( Q->item!=NULL );
-   Q->physicalSize = InitialSize;
-   Q->cursor = -1;
-   Q->length = 0;
-   Q->front = 0;
-   Q->back = -1;
-   return(Q);
+// newNode()
+// Returns reference to new Node object. Initializes next and data fields.
+Node newNode(ListElement data){
+   Node N = malloc(sizeof(NodeObj));
+   assert( N!=NULL );
+   N->data = data;
+   N->next = NULL;
+   N->prev = NULL;
+   return(N);
 }
 
-// freeQueue()
-// Frees all heap memory associated with Queue *pQ, and sets *pQ to NULL.
-void freeQueue(Queue* pQ){
-   if(pQ!=NULL && *pQ!=NULL) { 
-      free((*pQ)->item);
+// freeNode()
+// Frees heap memory pointed to by *pN, sets *pN to NULL.
+void freeNode(Node* pN){
+   if( pN!=NULL && *pN!=NULL ){
+      free(*pN);
+      *pN = NULL;
+   }
+}
+
+// newList()
+// Returns reference to new empty List object.
+List newList(){
+   List L;
+   L = malloc(sizeof(ListObj));
+   assert( L!=NULL );
+   L->front = L->back = NULL;
+   L->cursor = -1;
+   L->length = 0;
+   return(L);
+}
+
+// freeList()
+// Frees all heap memory associated with List *pL, and sets *pL to NULL.
+void freeList(List* pL){
+   if(pL!=NULL && *pL!=NULL) { 
+      while( length(*pL) > 0) { // while still elements in there
+        deleteBack(*pL); 		 
+      }
       free(*pQ);
       *pQ = NULL;
    }
@@ -75,141 +79,55 @@ void freeQueue(Queue* pQ){
 
 // Access functions -----------------------------------------------------------
 
-// getFront()
-// Returns the value at the front of Q.
-// Pre: !isEmpty(Q)
-
-QueueElement front(Queue Q){
-   if( Q==NULL ){
-      printf("Queue Error: calling getFront() on NULL Queue reference\n");
+// length()
+// Returns the length of L.
+int length(Queue L){
+   if( L==NULL ){
+      printf("Queue Error: calling length() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( length(Q) == 0 ){
-      printf("Queue Error: calling getFront() on an empty Queue\n");
-      exit(EXIT_FAILURE);
-   }
-   return Q->item[Q->front];
+   return(L->length);
 }
 
-QueueElement back(Queue Q){
-   if( Q==NULL ){
-      printf("Queue Error: calling getFront() on NULL Queue reference\n");
+// Returns index of cursor element if defined, -1 otherwise. 
+int index(List L) {
+   if( L==NULL ){
+      printf("List Error: calling index() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( length(Q) == 0 ){
-      printf("Queue Error: calling getFront() on an empty Queue\n");
-      exit(EXIT_FAILURE);
-   }
-   return Q->item[Q->back];
+   return L->cursor == -1 ? -1 : L->cursor; // if cursor -1 return that else return cursor
 }
 
-int index(Queue Q) {
-   if( Q==NULL ){
-      printf("Queue Error: calling getFront() on NULL Queue reference\n");
+// front()
+// Returns the value at the front of L.
+// Pre: length > 0
+ListElement front(List L){
+   if( L==NULL ){
+      printf("List Error: calling front() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   return Q->cursor;
-}
-
-int length(Queue Q){
-   if( Q==NULL ){
-      printf("Queue Error: calling getLength() on NULL Queue reference\n");
+   if( length(L) == 0 ){
+      printf("List Error: calling front() on an empty List\n");
       exit(EXIT_FAILURE);
    }
-   return(Q->length);
-}
-
-int get(Queue Q) {
-   if( Q==NULL ) { // Exit if NULL 
-      printf("Queue Error: calling getFront() on NULL Queue reference\n");
-      exit(EXIT_FAILURE);
-   }
-   if( !(length(Q) > 0) ) { // Exit if length is 0 or lesser
-      printf("Queue Error: calling getFront() on an empty Queue\n");
-      exit(EXIT_FAILURE);
-   }
-   if ( !(Q->cursor => 0) ) {  // Exit if cursor is NOT >= 0
-       printf("Queue Error: calling getFront() on an empty Queue\n");
-      exit(EXIT_FAILURE);
-   }
-	return Q->item[Q->cursor];	
-}
-
-bool equals(Queue Q, Queue Q) {
-	
+   return(L->front->data);
 }
 
 
-// Manipulation procedures ----------------------------------------------------
-
-// Enqueue()
-// Places new data at the back of Q.
-void Enqueue(Queue Q, QueueElement data)
-{
-   if( Q==NULL ){
-      printf("Queue Error: calling Enqueue() on NULL Queue reference\n");
+// back()
+// Returns the value at the back of L.
+// Pre: length > 0
+ListElement back(List L){
+   if( L==NULL ){
+      printf("List Error: calling back() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-
-   if( (Q->length)==(Q->physicalSize) ){
-      doubleItemArray(Q);
-   }
-   Q->back = ((Q->back)+1)%(Q->physicalSize);
-   Q->item[Q->back] = data;
-   Q->length++;
-}
-
-// Dequeue()
-// Deletes data at front of Q.
-// Pre: !isEmpty(Q)
-void Dequeue(Queue Q){
-   if( Q==NULL ){
-      printf("Queue Error: calling Dequeue() on NULL Queue reference\n");
+   if( length(L) == 0 ){
+      printf("List Error: calling back() on an empty List\n");
       exit(EXIT_FAILURE);
    }
-   if( isEmpty(Q) ){
-      printf("Queue Error: calling Dequeue on an empty Queue\n");
-      exit(EXIT_FAILURE);
-   }
-
-   Q->front = ((Q->front)+1)%(Q->physicalSize);
-   Q->length--;
+   return(L->back->data);
 }
 
 
-// Other Functions ------------------------------------------------------------
 
-// printQueue()
-// Prints a string representation of Q consisting of a space separated list 
-// of ints to stdout.
-void printQueue(Queue Q){
-   if( Q==NULL ){
-      printf("Queue Error: calling printQueue() on NULL Queue reference\n");
-      exit(EXIT_FAILURE);
-   }
-
-   int i;
-   for(i=0; i<Q->length; i++){
-      printf(FORMAT" ", Q->item[(Q->front+i)%(Q->physicalSize)]);
-   }
-   printf("\n");
-}
-
-// equals()
-// Returns true if A is same int sequence as B, false otherwise.
-bool equals(Queue A, Queue B){
-   if( A==NULL || B==NULL ){
-      printf("Queue Error: calling equals() on NULL Queue reference\n");
-      exit(EXIT_FAILURE);
-   }
-
-   int n, m, i;
-   n = A->physicalSize;
-   m = B->physicalSize;
-   bool eq = (A->length == B->length);
-
-   for(i = 0; eq && (i < A->length); i++){
-      eq = ( A->item[(A->front+i)%n] == B->item[(B->front+i)%m] );
-   }
-   return eq;
-}
