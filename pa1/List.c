@@ -130,4 +130,51 @@ ListElement back(List L){
 }
 
 
+// get()
+// Returns the value at the cursor of L.
+// Pre: length > 0, index() >= 0
+ListElement get(List L){
+   if( L==NULL ){
+      printf("List Error: calling get() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( length(L) == 0 ){
+      printf("List Error: calling get() on an empty List\n");
+      exit(EXIT_FAILURE);
+   }
+   if( index(L) < 0 ){ // if cursor index is undefined i.e. -1 exit the program
+      printf("List Error: calling get() on a List with an undefined cursor\n"); 
+      exit(EXIT_FAILURE);
+   }
+   return(L->back->data);
+}
 
+
+// Returns true iff Lists A and B are in same                              
+// state, and returns false otherwise.
+bool equals(List A, List B) {
+   if (length(A) != length(B)) { // not same length FALSE
+      return false;
+   }
+   if (index(A) != index(B)) { // diff cursor diff state FALSE
+      return false;
+   }
+   List tA = A; // create copies
+   List tB = B; // ^^^
+   moveBack(tA); // move cursor to end
+   moveback(tB); // ^^^
+   while ( !(index(tA) < 0) ) { // while cursor is defined
+      if (get(tA) != get(tB)) { // see if the elemnts are equivalent
+         return false; // if not return false
+      }
+      movePrev(tA); // continue to move towards front 
+      movePrev(tB); // ^^^
+   }
+   return true; // iff same length, same cursor index, same elements in same spots, they're equivalent
+
+}
+
+
+// Manipulation procedures ---------------------------------------------------- 
+
+// Resets L to its original empty state. 
