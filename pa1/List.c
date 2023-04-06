@@ -106,7 +106,7 @@ ListElement front(List L){
       printf("List Error: calling front() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( length(L) == 0 ){
+   if( length(L) < 1 ){
       printf("List Error: calling front() on an empty List\n");
       exit(EXIT_FAILURE);
    }
@@ -122,7 +122,7 @@ ListElement back(List L){
       printf("List Error: calling back() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( length(L) == 0 ){
+   if( length(L) < 1 ){
       printf("List Error: calling back() on an empty List\n");
       exit(EXIT_FAILURE);
    }
@@ -138,7 +138,7 @@ ListElement get(List L){
       printf("List Error: calling get() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( length(L) == 0 ){
+   if( length(L) < 1 ){
       printf("List Error: calling get() on an empty List\n");
       exit(EXIT_FAILURE);
    }
@@ -153,7 +153,15 @@ ListElement get(List L){
 // Returns true iff Lists A and B are in same                              
 // state, and returns false otherwise.
 bool equals(List A, List B) {
-   if (length(A) != length(B)) { // not same length FALSE
+   if( A==NULL ){
+      printf("List Error: calling equals() on NULL List reference: A\n");
+      exit(EXIT_FAILURE);
+   }
+	if( B==NULL ){
+      printf("List Error: calling equals() on NULL List reference: B\n");
+      exit(EXIT_FAILURE);
+   }
+	if (length(A) != length(B)) { // not same length FALSE
       return false;
    }
    if (index(A) != index(B)) { // diff cursor diff state FALSE
@@ -164,7 +172,7 @@ bool equals(List A, List B) {
    moveBack(tA); // move cursor to end
    moveback(tB); // ^^^
    while ( !(index(tA) < 0) ) { // while cursor is defined
-      if (get(tA) != get(tB)) { // see if the elemnts are equivalent
+      if (get(tA) != get(tB)) { // see if the elements are equivalent
          return false; // if not return false
       }
       movePrev(tA); // continue to move towards front 
@@ -177,4 +185,44 @@ bool equals(List A, List B) {
 
 // Manipulation procedures ---------------------------------------------------- 
 
-// Resets L to its original empty state. 
+// Resets L to its original empty state.
+void clear(List L) {
+	if( L==NULL){
+		printf("List Error: calling clear() on NULL List reference\n");
+   	exit(EXIT_FAILURE);
+	}
+   while( length(L) > 0) { // while still elements in there
+   	deleteBack(*pL); // delete until empty
+   }
+	return;
+}
+
+// Overwrites the cursor element’s data with x.                           
+// Pre: length()>0, index()>=0
+void set(List L, int x) {
+   if( L==NULL ){
+      printf("List Error: calling set() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( length(L) < 1 ){
+      printf("List Error: calling set() on an empty List\n");
+      exit(EXIT_FAILURE);
+   }
+   if( index(L) < 0 ){ // if cursor index is undefined i.e. -1 exit the program
+      printf("List Error: calling set() on a List with an undefined cursor\n");
+      exit(EXIT_FAILURE);
+   }
+   Node N = L->front;
+   while ( true ) { 
+      if (N->index == index(L)) {
+         N->data = (ListElement)x;
+         break;
+      }    
+      N = N->next;
+      if (N == NULL) {
+         printf("List Error: calling set() on a List with cursor outside of list\n");
+         exit(EXIT_FAILURE);
+      }
+   }
+      
+}
