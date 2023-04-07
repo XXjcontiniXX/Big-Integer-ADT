@@ -25,7 +25,7 @@ typedef struct NodeObj{
 typedef struct ListObj{
    Node front;
    Node back;
-   int cursor;
+   int index;
    int length;
 } ListObj;
 
@@ -59,7 +59,7 @@ List newList(){
    L = malloc(sizeof(ListObj));
    assert( L!=NULL );
    L->front = L->back = NULL;
-   L->cursor = -1;
+   L->index = -1;
    L->length = 0;
    return(L);
 }
@@ -95,7 +95,7 @@ int index(List L) {
       printf("List Error: calling index() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   return L->cursor == -1 ? -1 : L->cursor; // if cursor -1 return that else return cursor
+   return L->index == -1 ? -1 : L->index; // if cursor -1 return that else return cursor
 }
 
 // front()
@@ -187,14 +187,14 @@ bool equals(List A, List B) {
 
 // Resets L to its original empty state.
 void clear(List L) {
-	if( L==NULL){
-		printf("List Error: calling clear() on NULL List reference\n");
-   	exit(EXIT_FAILURE);
+   if( L==NULL){
+      printf("List Error: calling clear() on NULL List reference\n");
+      exit(EXIT_FAILURE);
 	}
    while( length(L) > 0) { // while still elements in there
    	deleteBack(*pL); // delete until empty
    }
-	return;
+   return;
 }
 
 // Overwrites the cursor element’s data with x.                           
@@ -226,3 +226,72 @@ void set(List L, int x) {
    }
       
 }
+
+// If L is non-empty, sets cursor under the front element,                          
+// otherwise does nothing.
+void moveFront(List L) {
+   if( L==NULL ){
+      printf("List Error: calling moveFront() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( length(L) < 1 ){
+      return;
+   }
+   L->index = 0; // sets to 0th element maybe this is incorrect i dont think so tho
+   return;
+}
+
+// If L is non-empty, sets cursor under the back element,                          
+// otherwise does nothing.
+void moveBack(List L) {
+   if( L==NULL ){
+      printf("List Error: calling moveBack() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( length(L) < 1 ){
+      return;
+   }
+   L->index = L->back->index;
+   return;
+}
+
+// If cursor is defined and not at front, move cursor one                           
+// step toward the front of L; if cursor is defined and at                           
+// front, cursor becomes undefined; if cursor is undefined                           
+// do nothing
+void movePrev(List L) {
+   if( L==NULL ){
+      printf("List Error: calling movePrev() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( L->index < 0 ){
+      return;
+   }
+   if( index(L) == L->front ){
+      L->index = -1;
+      return;
+   }
+   L->index = L->index - 1;
+   return;
+}
+
+// If cursor is defined and not at back, move cursor one                           
+// step toward the back of L; if cursor is defined and at                         
+// back, cursor becomes undefined; if cursor is undefined                           
+// do nothing
+void moveNext(List L) {
+   if( L==NULL ){
+      printf("List Error: calling moveNext() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( L->index < 0 ){
+      return;
+   }
+   if( index(L) == L->back ){
+      L->index = -1;
+      return;
+   }
+   L->index = L->index + 1;
+   return;
+}
+
