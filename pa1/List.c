@@ -71,8 +71,8 @@ void freeList(List* pL){
       while( length(*pL) > 0) { // while still elements in there
         deleteBack(*pL); 		 
       }
-      free(*pQ);
-      *pQ = NULL;
+      free(*pL);
+      *pL = NULL;
    }
 }
 
@@ -81,7 +81,7 @@ void freeList(List* pL){
 
 // length()
 // Returns the length of L.
-int length(Queue L){
+int length(List L){
    if( L==NULL ){
       printf("Queue Error: calling length() on NULL List reference\n");
       exit(EXIT_FAILURE);
@@ -170,7 +170,7 @@ bool equals(List A, List B) {
    List tA = A; // create copies
    List tB = B; // ^^^
    moveBack(tA); // move cursor to end
-   moveback(tB); // ^^^
+   moveBack(tB); // ^^^
    while ( !(index(tA) < 0) ) { // while cursor is defined
       if (get(tA) != get(tB)) { // see if the elements are equivalent
          return false; // if not return false
@@ -192,7 +192,7 @@ void clear(List L) {
       exit(EXIT_FAILURE);
 	}
    while( length(L) > 0) { // while still elements in there
-   	deleteBack(*pL); // delete until empty
+   	deleteBack(L); // delete until empty
    }
    return;
 }
@@ -267,7 +267,7 @@ void movePrev(List L) {
    if( L->index < 0 ){
       return;
    }
-   if( index(L) == L->front ){
+   if( index(L) == L->front->index ){
       L->index = -1;
       return;
    }
@@ -287,7 +287,7 @@ void moveNext(List L) {
    if( L->index < 0 ){
       return;
    }
-   if( index(L) == L->back ){
+   if( index(L) == L->back->index ){
       L->index = -1;
       return;
    }
