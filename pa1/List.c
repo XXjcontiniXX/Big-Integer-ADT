@@ -25,6 +25,7 @@ typedef struct NodeObj{
 typedef struct ListObj{
    Node front;
    Node back;
+   Node cursor;
    int index;
    int length;
 } ListObj;
@@ -58,6 +59,7 @@ List newList(){
    List L;
    L = malloc(sizeof(ListObj));
    assert( L!=NULL );
+   L->cursor = NULL;
    L->front = L->back = NULL;
    L->index = -1;
    L->length = 0;
@@ -146,7 +148,7 @@ ListElement get(List L){
       printf("List Error: calling get() on a List with an undefined cursor\n"); 
       exit(EXIT_FAILURE);
    }
-   return(L->back->data);
+   return(L->cursor->data);
 }
 
 
@@ -212,19 +214,8 @@ void set(List L, int x) {
       printf("List Error: calling set() on a List with an undefined cursor\n");
       exit(EXIT_FAILURE);
    }
-   Node N = L->front;
-   while ( true ) { 
-      if (N->index == index(L)) {
-         N->data = (ListElement)x;
-         break;
-      }    
-      N = N->next;
-      if (N == NULL) {
-         printf("List Error: calling set() on a List with cursor outside of list\n");
-         exit(EXIT_FAILURE);
-      }
-   }
-      
+   L->cursor->data = (ListElement)x;
+   return;
 }
 
 // If L is non-empty, sets cursor under the front element,                          
@@ -238,6 +229,7 @@ void moveFront(List L) {
       return;
    }
    L->index = 0; // sets to 0th element maybe this is incorrect i dont think so tho
+   L->cursor = L->front;
    return;
 }
 
@@ -252,6 +244,7 @@ void moveBack(List L) {
       return;
    }
    L->index = L->back->index;
+   L->cursor = L->back;
    return;
 }
 
@@ -269,9 +262,11 @@ void movePrev(List L) {
    }
    if( index(L) == L->front->index ){
       L->index = -1;
+      L->cursor = NULL;
       return;
    }
    L->index = L->index - 1;
+   L->cursor = L->cursor->prev;
    return;
 }
 
@@ -289,9 +284,11 @@ void moveNext(List L) {
    }
    if( index(L) == L->back->index ){
       L->index = -1;
+      L->cursor = NULL;
       return;
    }
    L->index = L->index + 1;
+   L->cursor = L->cursor->next;
    return;
 }
 
@@ -303,6 +300,13 @@ void prepend(List L, int x) {
       exit(EXIT_FAILURE);
    }
 	Node N = newNode((ListElement)x);
+   if ( length(L) == 0 ) {
+      L->back = N;
+      L->front = N;
+      N->index = 0;
+      L->length = 1;
+      return;
+   }	
 	N->index = 0;
 	if ( length(L) > 0 ) {
 		Node second = L->front;
@@ -321,6 +325,7 @@ void prepend(List L, int x) {
 		L->front = N;
 		L->back = N;
 	}
+	L->length += 1;
 	return;
 }
 
@@ -331,8 +336,15 @@ void append(List L, int x){
       printf("List Error: calling append() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-	Node N = newNode((ListElement)x);
-	N->index = L->back->index + 1;
+   Node N = newNode((ListElement)x);
+   if ( length(L) == 0 ) {
+      L->back = N;
+      L->front = N;
+      N->index = 0;
+      L->length = 1;
+      return;         	   		
+   }
+   N->index = L->back->index + 1;
    if ( length(L) > 0 ) {
       Node second = L->back;
       L->back = N;
@@ -342,6 +354,7 @@ void append(List L, int x){
       L->back = N;
       L->front = N;
    }
+   L->length += 1;
    return;
 }
 
@@ -383,6 +396,7 @@ void insertBefore(List L, int x) {
 		}
 		after = after->next;
 	}
+	L->length += 1;
 	return;
 }
 
@@ -423,6 +437,7 @@ void insertAfter(List L, int x) {
       }
       before = before->next;
    }
+   L->length += 1;
    return;
 }
 
@@ -515,4 +530,28 @@ void delete(List L) {
 	}
 	L->length = L->length - 1;
 	return;
+}
+
+// Prints to the file pointed to by out, a                                      
+// string representation of L consisting                                      
+// of a space separated sequence of integers,                                     
+// with front on left.
+void printList(FILE* out, List L) {
+   if( L==NULL ){
+      printf("List Error: calling printList() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( length(L) < 1 ){
+      printf("List Error: calling printList() on an empty List\n");
+      exit(EXIT_FAILURE);
+   }
+
+   fprintf(out, "front ");
+   Node N = L->front;
+   do {
+      fprintf(out, "%d ", (int)N->data);
+      N = N->next;
+   } while (N->next != NULL);
+   fprintf(out, "%d ", (int)N->data);
+   fprintf(out, "\n");
 }
