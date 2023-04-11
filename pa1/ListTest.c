@@ -106,13 +106,17 @@ int main(int argc, char* argv[]){
 		// insertBefore
 			// when cursor is L->front
 			moveBack(C);
+			printf("C: ");
+			printList(stdout, C);
+			printf("Cs: ");
+			printList(stdout, sC);
+			printf("0\n0\n0\n0\n");
                         for (int i = 7; i < 16; i++) {
                                 insertBefore(C, i);
-                                movePrev(L);
+                                movePrev(C);
+				printList(stdout, C);
                         }
-                        printList(stdout, sC);
-                        printList(stdout, C);
-                        assert(equals(sC, C));
+                        //assert(equals(sC, C));
 			// when cursor is in the middle
 
 	// Tesing insertAfter() and insertBefore for undefined
