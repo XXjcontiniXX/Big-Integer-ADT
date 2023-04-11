@@ -71,7 +71,7 @@ List newList(){
 void freeList(List* pL){
    if(pL!=NULL && *pL!=NULL) { 
       while( length(*pL) > 0) { // while still elements in there
-        deleteBack(*pL); 		 
+         deleteBack(*pL);
       }
       free(*pL);
       *pL = NULL;
@@ -169,17 +169,28 @@ bool equals(List A, List B) {
    if (index(A) != index(B)) { // diff cursor diff state FALSE
       return false;
    }
-   List tA = A; // create copies
-   List tB = B; // ^^^
+   if ((length(A) == 0) && (length(B) == 0)) {
+   	return true;
+   }
+   if ((length(A) == 0) || (length(B) == 0)) { // if length a or b is zero and we know the lengths dont equal then its false
+   	return false;
+   }
+   List tA = copyList(A); // create copies // I need to make a function for this LOL
+   List tB = copyList(B); // ^^^ 		// FORGOT ABOUT THAT HAHA		
+	
    moveBack(tA); // move cursor to end
    moveBack(tB); // ^^^
    while ( !(index(tA) < 0) ) { // while cursor is defined
       if (get(tA) != get(tB)) { // see if the elements are equivalent
+	 freeList(&tA);
+	 freeList(&tB);
          return false; // if not return false
       }
       movePrev(tA); // continue to move towards front 
       movePrev(tB); // ^^^
    }
+   freeList(&tA);
+   freeList(&tB);
    return true; // iff same length, same cursor index, same elements in same spots, they're equivalent
 
 }
@@ -230,6 +241,7 @@ void moveFront(List L) {
    }
    L->index = 0; // sets to 0th element maybe this is incorrect i dont think so tho
    L->cursor = L->front;
+   L->cursor->index = 0;
    return;
 }
 
@@ -245,6 +257,7 @@ void moveBack(List L) {
    }
    L->index = L->back->index;
    L->cursor = L->back;
+   L->cursor->index = L->back->index;
    return;
 }
 
@@ -309,6 +322,7 @@ void prepend(List L, int x) {
    }	
 	N->index = 0;
 	if ( length(L) > 0 ) {
+		N->index = 0;
 		Node second = L->front;
 		L->front = N;
 		L->front->next = second; // front->second
@@ -346,6 +360,7 @@ void append(List L, int x){
    }
    N->index = L->back->index + 1;
    if ( length(L) > 0 ) {
+      N->index = length(L);
       Node second = L->back;
       L->back = N;
       L->back->prev = second; // second<-back
@@ -415,7 +430,7 @@ void insertAfter(List L, int x) {
       printf("List Error: calling insertAfter() on a List with an undefined cursor\n");
       exit(EXIT_FAILURE);
    }
-	if ( index(L) == length(L) - 1 ) { // covers no N->next case
+   if ( index(L) == L->back->index ) { // covers no N->next case
       append(L, x);
       return;
    }
@@ -451,6 +466,18 @@ void deleteFront(List L) {
       printf("List Error: calling deleteFront() on an empty List\n");
       exit(EXIT_FAILURE);
    }
+   if(length(L) == 1){
+        freeNode(&(L->front));
+        L->front = NULL;
+        L->back = NULL;
+        L->cursor = NULL;
+        L->index = -1;
+        L->length = 0;
+        return;
+   }
+   if ( (index(L) != -1) && (L->front->index == L->cursor->index) ) {
+      L->index = -1;
+   }
    Node second = L->front->next; // new second node, after front
    second->prev = NULL; // new first node has no prev
    freeNode(&(L->front)); // free the node we dont need
@@ -474,6 +501,19 @@ void deleteBack(List L) {
    if( length(L) < 1 ){
       printf("List Error: calling deleteBack() on an empty List\n");
       exit(EXIT_FAILURE);
+   }
+   if(length(L) == 1){
+   	freeNode(&(L->front));
+	L->front = NULL;
+	L->back = NULL;
+	L->cursor = NULL;
+	L->index = -1;
+	L->length = 0;
+	return;
+   }
+
+   if( (index(L) != -1) && (L->back->index == L->cursor->index) ){
+      L->index = -1;
    }
    Node second = L->back->prev; // second from back is back prev
    second->next = NULL; // new back node no longer has next
@@ -553,5 +593,35 @@ void printList(FILE* out, List L) {
       N = N->next;
    } while (N->next != NULL);
    fprintf(out, "%d ", (int)N->data);
+   fprintf(out, "cursor %d", index(L));
    fprintf(out, "\n");
+}
+
+// Returns a new List representing the same integer                          
+// sequence as L. The cursor in the new list is undefined,                         
+// regardless of the state of the cursor in L. The state                          
+// of L is unchanged.
+List copyList(List L) {
+   if( L==NULL ){
+      printf("List Error: calling copyList() on NULL List reference\n");
+      exit(EXIT_FAILURE);
+   }
+   List C = newList();
+	Node iter = L->front;
+   if ( length(L) == 0 ) { // if length is 0 just return empty list
+      List P = newList();
+      return P;
+   }
+
+
+   do {
+      append(C, (int)(iter->data)); // append node
+      if (iter->index == index(L)) { // if that node is the cursor 
+         C->cursor = C->back; // since its the back node make that the cursor
+         C->index = index(L);
+      }
+      iter = iter->next;
+   } while (iter != NULL);
+
+   return C;
 }
