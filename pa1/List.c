@@ -557,14 +557,11 @@ void printList(FILE* out, List L) {
       printf("List Error: calling printList() on an empty List\n");
       exit(EXIT_FAILURE);
    }
-
-   fprintf(out, "front ");
    Node N = L->front;
    do {
       fprintf(out, "%d ", (int)N->data);
       N = N->next;
    } while (N != NULL);
-   fprintf(out, "cursor %d", index(L));
 }
 
 // Returns a new List representing the same integer                          
