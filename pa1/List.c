@@ -26,7 +26,6 @@ typedef struct ListObj{
    Node front;
    Node back;
    Node cursor;
-   int index;
    int length;
 } ListObj;
 
@@ -61,7 +60,6 @@ List newList(){
    assert( L!=NULL );
    L->cursor = NULL;
    L->front = L->back = NULL;
-   L->index = -1;
    L->length = 0;
    return(L);
 }
@@ -97,7 +95,7 @@ int index(List L) {
       printf("List Error: calling index() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   return L->index == -1 ? -1 : L->index; // if cursor -1 return that else return cursor
+   return L->cursor == NULL ? -1 : L->cursor->index; // if cursor -1 return that else return cursor
 }
 
 // front()
@@ -239,9 +237,7 @@ void moveFront(List L) {
    if( length(L) < 1 ){
       return;
    }
-   L->index = 0; // sets to 0th element maybe this is incorrect i dont think so tho
    L->cursor = L->front;
-   L->cursor->index = 0;
    return;
 }
 
@@ -255,9 +251,8 @@ void moveBack(List L) {
    if( length(L) < 1 ){
       return;
    }
-   L->index = L->back->index;
+   //printf("Printing L->back->index: %d\n", L->back->index);
    L->cursor = L->back;
-   L->cursor->index = L->back->index;
    return;
 }
 
@@ -270,15 +265,13 @@ void movePrev(List L) {
       printf("List Error: calling movePrev() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( L->index < 0 ){
+   if( index(L) < 0 ){
       return;
    }
    if( index(L) == L->front->index ){
-      L->index = -1;
       L->cursor = NULL;
       return;
    }
-   L->index = L->index - 1;
    L->cursor = L->cursor->prev;
    return;
 }
@@ -292,15 +285,13 @@ void moveNext(List L) {
       printf("List Error: calling moveNext() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   if( L->index < 0 ){
+   if( index(L) < 0 ){
       return;
    }
    if( index(L) == L->back->index ){
-      L->index = -1;
       L->cursor = NULL;
       return;
    }
-   L->index = L->index + 1;
    L->cursor = L->cursor->next;
    return;
 }
@@ -321,23 +312,17 @@ void prepend(List L, int x) {
       return;
    }	
 	N->index = 0;
-	if ( length(L) > 0 ) {
-		N->index = 0;
-		Node second = L->front;
-		L->front = N;
-		L->front->next = second; // front->second
-		second->prev = L->front; // front-><-second
-		
-		N = L->front; // N is front node
-		int indexes = N->index; // indexes is the index of the first node
-		do { 
-			N->index = indexes; // N's index becomes indexes
-			N = N->next; // N is the next node
-			indexes += 1; // indexes increments
-		} while( N->next != NULL ); // checks that there will be a next node else break
-	}else{
-		L->front = N;
-		L->back = N;
+	N->next = L->front;
+	N->prev = NULL;
+	L->front->prev = N;
+	L->front = N;
+
+	int indexes = 1; // indexes is the index of the first node
+	Node iter = L->front;
+	while (iter->next != NULL) {
+		iter->next->index += 1; // N's index becomes indexes
+		iter = iter->next; // N is the next node
+		indexes += 1; // indexes increments
 	}
 	L->length += 1;
 	return;
@@ -351,6 +336,7 @@ void append(List L, int x){
       exit(EXIT_FAILURE);
    }
    Node N = newNode((ListElement)x);
+
    if ( length(L) == 0 ) {
       L->back = N;
       L->front = N;
@@ -358,17 +344,13 @@ void append(List L, int x){
       L->length = 1;
       return;         	   		
    }
+
    N->index = L->back->index + 1;
-   if ( length(L) > 0 ) {
-      N->index = length(L);
-      Node second = L->back;
-      L->back = N;
-      L->back->prev = second; // second<-back
-      second->next = L->back; // second-><-back
-   }else{
-      L->back = N;
-      L->front = N;
-   }
+   N->prev = L->back;
+   N->next = NULL;
+   L->back->next = N;
+   L->back = N;
+  
    L->length += 1;
    return;
 }
@@ -396,20 +378,14 @@ void insertBefore(List L, int x) {
 	
 	Node N = newNode((ListElement)x);
 	N->index = index(L); // set the new node's index to the cursor
-	Node after = L->front; // the current node on the cursor will become the after node
-	while ( true ) {
-		if ( after->index == index(L) ) {
-			Node before = after->prev;
-			N->next = after;
-			N->prev = before;
-			before->next = N;
-			after->prev = N;
-			while ( N->next != NULL) { // since "N" becomes "after", N->next n beyond need their index +1'd
-				N->next->index += 1;
-				N = N->next;
-			}
-		}
-		after = after->next;
+   N->prev = L->cursor->prev;
+   N->next = L->cursor;
+   L->cursor->prev->next = N;
+   L->cursor->prev = N;
+   Node iter = L->cursor;
+	while ( iter != NULL) { // since "N" becomes "after", N->next n beyond need their index +1'd
+		iter->index += 1;
+		iter = iter->next;
 	}
 	L->length += 1;
 	return;
@@ -437,20 +413,13 @@ void insertAfter(List L, int x) {
 	
    Node N = newNode((ListElement)x);
    N->index = index(L) + 1; // set the new node's index to the cursor
-   Node before = L->front; // the current node on the cursor will become the after node
-   while ( true ) {
-      if ( before->index == index(L) ) {
-         Node after = before->next;
-         N->next = after;
-         N->prev = before;
-         before->next = N;
-         after->prev = N;
-         while ( N->next != NULL) { // since "N" becomes "after", N->next n beyond need their index +1'd
-            N->next->index += 1;
-				N = N->next;
-         }
-      }
-      before = before->next;
+	N->prev = L->cursor; 
+	N->next = L->cursor->next;
+	L->cursor->next->prev = N;
+	L->cursor->next = N;
+   while ( N->next != NULL) { // since "N" becomes "after", N->next n beyond need their index +1'd
+      N->next->index += 1;
+	   N = N->next;
    }
    L->length += 1;
    return;
@@ -471,12 +440,11 @@ void deleteFront(List L) {
         L->front = NULL;
         L->back = NULL;
         L->cursor = NULL;
-        L->index = -1;
         L->length = 0;
         return;
    }
    if ( (index(L) != -1) && (L->front->index == L->cursor->index) ) {
-      L->index = -1;
+      L->cursor = NULL;
    }
    Node second = L->front->next; // new second node, after front
    second->prev = NULL; // new first node has no prev
@@ -507,13 +475,12 @@ void deleteBack(List L) {
 	L->front = NULL;
 	L->back = NULL;
 	L->cursor = NULL;
-	L->index = -1;
 	L->length = 0;
 	return;
    }
 
    if( (index(L) != -1) && (L->back->index == L->cursor->index) ){
-      L->index = -1;
+      L->cursor = NULL;
    }
    Node second = L->back->prev; // second from back is back prev
    second->next = NULL; // new back node no longer has next
@@ -542,32 +509,37 @@ void delete(List L) {
 	
 	// 3 cases, if delete on one element list clear(), if on end deleteBack(), if in start deleteFront() 
 	if( length(L) == 1 ) { 
-		clear(L);
+		freeNode(&(L->front));
+		L->front = NULL;
+		L->back = NULL;
+		L->cursor = NULL;
+		L->length = 0;
 		return;
 	}
 	if ( index(L) == 0 ) { // covers no N->prev case
       deleteFront(L);
+      L->length -= 1;
+		L->cursor = NULL;
       return;
    }
-	if ( index(L) == length(L) - 1 ) { // covers no N->next case
+	if ( index(L) == L->back->index) { // covers no N->next case
       deleteBack(L);
+      L->length -= 1;
+		L->cursor = NULL;
       return;
    }
-	
-	Node N = L->front;
-	while ( true ) {
-		if ( index(L) == N->index ) {
-			N->prev->next = N->next;
-			N->next->prev = N->prev;
-			while ( N->next != NULL) { // starting after front start decrementing indexes
-      		N->next->index -= 1;
-      		N = N->next;
-   		}
-			freeNode(&(N));
-			break;
-		}
-		N = N->next;
-	}
+
+	L->cursor->prev->next = L->cursor->next;
+	L->cursor->next->prev = L->cursor->prev;
+	Node iter = L->cursor->next;
+	freeNode(&(L->cursor));
+	L->cursor = NULL;
+
+	while ( iter != NULL) { // starting after front start decrementing indexes
+      iter->index -= 1;
+      iter = iter->next;
+   }
+
 	L->length = L->length - 1;
 	return;
 }
@@ -591,10 +563,8 @@ void printList(FILE* out, List L) {
    do {
       fprintf(out, "%d ", (int)N->data);
       N = N->next;
-   } while (N->next != NULL);
-   fprintf(out, "%d ", (int)N->data);
+   } while (N != NULL);
    fprintf(out, "cursor %d", index(L));
-   fprintf(out, "\n");
 }
 
 // Returns a new List representing the same integer                          
@@ -618,7 +588,6 @@ List copyList(List L) {
       append(C, (int)(iter->data)); // append node
       if (iter->index == index(L)) { // if that node is the cursor 
          C->cursor = C->back; // since its the back node make that the cursor
-         C->index = index(L);
       }
       iter = iter->next;
    } while (iter != NULL);
