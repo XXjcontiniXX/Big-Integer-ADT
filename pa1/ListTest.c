@@ -1,17 +1,67 @@
-//-----------------------------------------------------------------------------
-// ListTest.c
-// Another test client for Queue ADT
-//-----------------------------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "List.h"
-#include <assert.h>
+/*
+TestClient.c
+*  Test client for List ADT
+*****************************************************************************************/
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdbool.h>
+#include<assert.h>
+#include"List.h"
 
 int main(int argc, char* argv[]){
+   
+   List A = newList();
+   List B = newList();
+   List C = NULL;
+   int i;
+
+   for(i=1; i<=20; i++){
+      append(A,i);
+      prepend(B,i);
+   }
+   printList(stdout,A); 
+   printf("\n");
+   printList(stdout,B); 
+   printf("\n");
+
+   for(moveFront(A); index(A)>=0; moveNext(A)){
+      printf("%d ", get(A));
+   }
+   printf("\n");
+   for(moveBack(B); index(B)>=0; movePrev(B)){
+	printf("%d ", get(B));
+   }
+   printf("\n");
+
+   C = copyList(A);
+   printf("%s\n", equals(A,B)?"true":"false");
+   printf("%s\n", equals(B,C)?"true":"false");
+   printf("%s\n", equals(C,A)?"true":"false");
+
+
+   moveFront(A);
+   for(i=0; i<5; i++) moveNext(A); // at index 5
+   insertBefore(A, -1);            // at index 6
+   for(i=0; i<9; i++) moveNext(A); // at index 15
+   insertAfter(A, -2);
+   for(i=0; i<5; i++) movePrev(A); // at index 10
+   delete(A);
+   printList(stdout,A);
+   printf("\n");
+   printf("%d\n", length(A));
+   clear(A);
+   printf("%d\n", length(A));
+   printf("\n\nEnd provided tests\n\n");
+
+   freeList(&A);
+   freeList(&B);
+   freeList(&C);
+
+   /// ///
+	////////////// Begin my tests.
+	/// ///
 	List L = newList();
-	List C = newList();
+	List F = newList();
 	// Normal and defined cursor in the back
 	
 	prepend(L, 3);
@@ -20,24 +70,21 @@ int main(int argc, char* argv[]){
         append(L, 5);
         prepend(L, 1);
 	append(L, 6);
-	
-
 	//printList(stdout, L);
-	
-	append(C, 1);
-	append(C, 2);
-	append(C, 3);
-	append(C, 4);
-	append(C, 5);
-	append(C, 6);
+	append(F, 1);
+	append(F, 2);
+	append(F, 3);
+	append(F, 4);
+	append(F, 5);
+	append(F, 6);
 	
 	//printList(stdout, C);
 
-	assert(equals(C, L)); // undefined cursor
+	assert(equals(F, L)); // undefined cursor
 
 	moveFront(L);
 	List Lcopy = copyList(L); // copy of L made
-	assert(!(equals(C, L))); // cursor changed and asserting incorrectness
+	assert(!(equals(F, L))); // cursor changed and asserting incorrectness
 	
 	//printList(stdout, L);
 	//printList(stdout, Lcopy);
@@ -45,18 +92,18 @@ int main(int argc, char* argv[]){
 	assert(equals(Lcopy, L)); // asserting copy and L work
 
 	moveBack(L);
-	moveBack(C);
+	moveBack(F);
 	printf("get(L): %d\n", get(L));
-	assert(equals(C, L)); // cursor moved to same spot
+	assert(equals(F, L)); // cursor moved to same spot
 	
 	printList(stdout, L);
 	printf("get(L) %d\n", get(L));
 	set(L, 0);
 	
-	assert(!(equals(C, L))); // changing data
+	assert(!(equals(F, L))); // changing data
 
-	set(C, 0);
-	assert(equals(C, L)); // equalizing data
+	set(F, 0);
+	assert(equals(F, L)); // equalizing data
 	
 	// checking undefined feature in movePrev()
 	for (int i = 0; i < 10; i++) {
@@ -71,14 +118,14 @@ int main(int argc, char* argv[]){
 	assert(index(L) == -1);
 	moveBack(L); // moving cursor backi
 	set(L, 6);
-	set(C, 6);
+	set(F, 6);
 	printf("Passed moveNext() and movePrev() checks\n");
 
 	//^^Quickly testing moveback and front works as designed for small case before rigourous testing
 	printf("\n\n\n");
 	printf("Rigorous testing beginning with these two lists:\n");
 	printList(stdout, L);
-	printList(stdout, C);
+	printList(stdout, F);
 	List sL = newList(); 
 	List sC = newList();  
 	for (int i = 1; i < 16; i++) {
@@ -98,37 +145,42 @@ int main(int argc, char* argv[]){
 				moveNext(L);
 			}
 			printList(stdout, sL);
+			printf("\n");
 			printList(stdout, L);
-			assert(equals(sL, L));
+			printf("\n");
+			assert(equals(sL, L)); //asserting equality
 			
-			// when cursor is L->front
-			// when cursor is in the middle
 		// insertBefore
 			// when cursor is L->front
-			moveBack(C);
-			printf("C: ");
-			printList(stdout, C);
-			printf("Cs: ");
-			printList(stdout, sC);
-			printf("0\n0\n0\n0\n");
+			moveBack(F);
                         for (int i = 7; i < 16; i++) {
-                                insertBefore(C, i);
-                                movePrev(C);
-				printList(stdout, C);
+                                insertBefore(F, i);
+                                movePrev(F);
                         }
-                        //assert(equals(sC, C));
-			// when cursor is in the middle
-
-	// Tesing insertAfter() and insertBefore for undefined
-
-	
-	
-
-
-	freeList(&C);
+			printList(stdout, F);
+			printf("\n");
+			printList(stdout, sC);
+			printf("\n");
+                        assert(!(equals(sC, C))); // asserting inequality
+	freeList(&F);
 	freeList(&L);
 	freeList(&Lcopy);
 	freeList(&sL);
 	freeList(&sC);
-	return 0;
+
+   return(0);
 }
+
+/*
+Output of this program:
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+false
+false
+true
+1 2 3 4 5 -1 6 7 8 9 11 12 13 14 15 -2 16 17 18 19 20
+21
+0
+*/
