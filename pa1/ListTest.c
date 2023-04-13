@@ -166,13 +166,26 @@ int main(int argc, char* argv[]){
 			printf("\n");
 			printList(stdout, sC);
 			printf("\n");
-                        assert(!(equals(sC, C))); // asserting inequality
+         assert(!(equals(sC, F))); // asserting inequality
+	List X = newList();
+	append(X, 1);
+   append(X, 2);
+   moveFront(X);
+   delete (X);
+   append(X, 3);
+   append(X, 5);
+   moveFront(X);
+   insertAfter(X, 12);
+   delete(X);
+   printf("(should be 3) Length: %d\n", length(X));
+
+	freeList(&X);
 	freeList(&F);
 	freeList(&L);
 	freeList(&Lcopy);
 	freeList(&sL);
 	freeList(&sC);
-
+	
    return(0);
 }
 
