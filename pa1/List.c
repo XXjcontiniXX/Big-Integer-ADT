@@ -169,9 +169,6 @@ bool equals(List A, List B) {
 	if (length(A) != length(B)) { // not same length FALSE
       return false;
    }
-   if (index(A) != index(B)) { // diff cursor diff state FALSE
-      return false;
-   }
    if ((length(A) == 0) && (length(B) == 0)) {
    	return true;
    }
