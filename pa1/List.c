@@ -523,13 +523,11 @@ void delete(List L) {
 	}
 	if ( index(L) == 0 ) { // covers no N->prev case
       deleteFront(L);
-      L->length -= 1;
 		L->cursor = NULL;
       return;
    }
 	if ( index(L) == L->back->index) { // covers no N->next case
       deleteBack(L);
-      L->length -= 1;
 		L->cursor = NULL;
       return;
    }
