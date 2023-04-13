@@ -576,18 +576,13 @@ List copyList(List L) {
    List C = newList();
 	Node iter = L->front;
    if ( length(L) == 0 ) { // if length is 0 just return empty list
-      List P = newList();
-      return P;
+      C->length = 0;
+      return C;
    }
-
-
    do {
       append(C, (int)(iter->data)); // append node
-      if (iter->index == index(L)) { // if that node is the cursor 
-         C->cursor = C->back; // since its the back node make that the cursor
-      }
       iter = iter->next;
    } while (iter != NULL);
-
+   C->length = length(L);
    return C;
 }

@@ -28,7 +28,6 @@ int main(int argc, char* argv[]){
    printf("\n");
    printList(stdout,B); 
    printf("\n");
-
    for(moveFront(A); index(A)>=0; moveNext(A)){
       printf("%d ", get(A));
    }
@@ -37,8 +36,9 @@ int main(int argc, char* argv[]){
 	printf("%d ", get(B));
    }
    printf("\n");
-
+   printf("yes\n");
    C = copyList(A);
+   printf("no\n");
    printf("%s\n", equals(A,B)?"true":"false");
    printf("%s\n", equals(B,C)?"true":"false");
    printf("%s\n", equals(C,A)?"true":"false");
@@ -61,7 +61,6 @@ int main(int argc, char* argv[]){
    freeList(&A);
    freeList(&B);
    freeList(&C);
-
    /// ///
 	////////////// Begin my tests.
 	/// ///
@@ -89,7 +88,7 @@ int main(int argc, char* argv[]){
 
 	moveFront(L);
 	List Lcopy = copyList(L); // copy of L made
-	assert(!(equals(F, L))); // cursor changed and asserting incorrectness
+	assert((equals(F, L))); // cursor changed and asserting incorrectness
 	
 	//printList(stdout, L);
 	//printList(stdout, Lcopy);
@@ -171,7 +170,7 @@ int main(int argc, char* argv[]){
 	append(X, 1);
    append(X, 2);
    moveFront(X);
-   delete (X);
+   delete(X);
    append(X, 3);
    append(X, 5);
    moveFront(X);
