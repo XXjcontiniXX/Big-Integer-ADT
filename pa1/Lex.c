@@ -58,11 +58,6 @@ int main(int argc, char* argv[]){
    List L = newList();
    int opt = -1;
    for (int i = 0; i < line_count; i++) {
-      /*printf("Line: %d\n",i);
-      if (i == 3){
-      	printList(stdout, L);
-	printf("index(L): %d\n", index(L));
-      }*/
       if ( length(L) > 0 ) {
          while ( index(L) != -1 && strcmp(strarr[i], strarr[get(L)] ) > 0 ) { // line were on comes after or with cursor
             moveNext(L);
