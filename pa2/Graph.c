@@ -34,9 +34,9 @@ Graph newGraph(int n) {
 	for (int i = 1; i <= n; i++) {
 		(G->adj)[i] = newList();
 	}
-	G->wgb = (uint8_t*)malloc(sizeof(uint8_t)*(n + 1));
-	G->p = (int*)malloc(sizeof(int)*(n + 1));
-	G->d = (int*)malloc(sizeof(int)*(n + 1));
+	G->wgb = (uint8_t*)calloc(sizeof(uint8_t), (n + 1));
+	G->p = (int*)calloc(sizeof(int), (n + 1));
+	G->d = (int*)calloc(sizeof(int), (n + 1));
 	G->order = n;
 	G->size = 0;
 	G->s = NIL;
@@ -64,11 +64,73 @@ int getOrder(Graph G) {
 	return G->order;
 }
 
-int getSize(Graph G);
-int getSource(Graph G);
-int getParent(Graph G, int u);
-int getDist(Graph G, int u);
-void getPath(List L, Graph G, int u);
+int getSize(Graph G) {
+	if (G == NULL) {
+      printf("Graph Error: calling getSize() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+	return G->size;
+}
+
+int getSource(Graph G) {
+	if (G == NULL) {
+      printf("Graph Error: calling getSource() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+	return G->s;
+}
+
+int getParent(Graph G, int u) {
+	if (G == NULL) {
+      printf("Graph Error: calling getParent() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+	if ( !(u > 0 && u <= getOrder(G)) ) {
+      printf("Graph Error: calling getParent() with an invalid vertex\n");
+      exit(EXIT_FAILURE);
+   }
+	return (G->p)[u];
+}
+
+int getDist(Graph G, int u) {
+	if (G == NULL) {
+      printf("Graph Error: calling getDist() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+	if ( !(getSource(G) != NIL) ) {
+      printf("Graph Error: calling getDist() without calling BFS() first\n");
+      exit(EXIT_FAILURE);
+   }
+	if ( !(u > 0 && u <= getOrder(G)) ) {
+      printf("Graph Error: calling getDist() with an invalid vertex\n");
+      exit(EXIT_FAILURE);
+   }
+	return (G->d)[u];
+}
+
+void getPath(List L, Graph G, int u) {
+	if (G == NULL) {
+      printf("Graph Error: calling getPath() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if ( !(u > 0 && u <= getOrder(G)) ) {
+      printf("Graph Error: calling getPath() with an invalid vertex\n");
+      exit(EXIT_FAILURE);
+   }
+	if ( !(getSource(G)!= NIL) ) {
+		printf("Graph Error: calling getPath() without calling BFS() first\n");
+      exit(EXIT_FAILURE);
+	}
+	if ( u == getSource(G) ) {
+		append(L, getSource(G));
+		return;
+	} else if ( (G->p)[u] == NIL ) {
+		printf("%d is not reachable from %d.\n", u, getSource(G));
+	} else {
+		getPath(L, G, (G->p)[u]);
+		append(L, u);
+	}
+}
 
 /*** Manipulation procedures ***/
 void makeNull(Graph G) {
@@ -76,10 +138,10 @@ void makeNull(Graph G) {
       printf("Graph Error: calling makeNull() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
    }
-	G->size = 0;
 	for (int i = 1; i <= getOrder(G); i++) {
       clear((G->adj)[i]);
    }
+	G->size = 0;
 	return;
 }
 
@@ -88,46 +150,40 @@ void addEdge(Graph G, int u, int v) {
       printf("Graph Error: calling addEdge() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
    }
-
-	List uList = G->adj[u];
-	List vList = G->adj[v];
-	moveFront(uList);
-	moveFront(vList);
-	
-	if ( length(uList) != 0 ) { // if 0 just append else
-		while ( index(uList) != -1 && v > get(uList) ) { // we havent moved past or must continue 
-			moveNext(uList); // move next
-		}
-		if (index(uList) == -1) { // if we moved past
-			append(uList, v); // append v
-		}else{
-			if (v == get(uList)) {
-         	return;
-      	}
-			insertBefore(uList, v); // if we never moved past, we just moved to our spot insert
-		}
-	}else{
-		append(uList, v); // see above
-	}
-	
-	if ( length(vList) != 0 ) { // parrallel logic
-		while ( index(vList) != -1 && u > get(vList)) {
-			moveNext(vList);
-		}
-		if (index(vList) == -1) {
-         append(vList, u);
-      }else{
-         insertBefore(vList, u);
-      }
-		
-	}else{
-		append(vList, u);
-	}
-	
+	addArc(G, u, v);
+	addArc(G, v, u);
+	return;
 }
 
-void addArc(Graph G, int u, int v);
+
+void addArc(Graph G, int u, int v) {
+	if (G == NULL) {
+      printf("Graph Error: calling addEdge() on NULL Graph reference\n");
+      exit(EXIT_FAILURE);
+   }
+	
+	List uList = G->adj[u];
+	moveFront(uList);
+
+	if ( length(uList) != 0 ) { // if 0 just append else
+      while ( index(uList) != -1 && v > get(uList) ) { // we havent moved past or must continue
+         moveNext(uList); // move next
+      }
+      if (index(uList) == -1) { // if we moved past
+         append(uList, v); // append v
+      }else{
+         if (v == get(uList)) {
+            return;
+         }
+         insertBefore(uList, v); // if we never moved past, we just moved to our spot insert
+      }
+   }else{
+      append(uList, v); // see above
+   }
+}
+
 void BFS(Graph G, int s) {
+	G->s = s;
 	for (int i = 1; i <= getOrder(G); i++) {
 		if ( i == s ) {continue;}
 		(G->wgb)[i] = white;
@@ -156,19 +212,17 @@ void BFS(Graph G, int s) {
 		}
 		(G->wgb)[x] = black; // Do this full thing for every element in the graph, so ixnay this one
 	}
-	
-	
 
 }
 
 /*** Other operations ***/
 void printGraph(FILE* out, Graph G) {
 	for (int i = 1; i <= getOrder(G); i++) {
+		fprintf(out, "%d: ", i);
 		if ( length(G->adj[i]) > 0 ) {
-			fprintf(out, "%d: ", i);
 			printList(out, G->adj[i]);
-			fprintf(out, "\n");
 		}
+		fprintf(out, "\n");
    }
 	return;
 }

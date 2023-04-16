@@ -18,11 +18,16 @@ int main(int argc, char* argv[]) {
 	Graph G = newGraph(10);	
 	addEdge(G, 1, 2);
 	addEdge(G, 1, 3);
-	addEdge(G, 1, 5);
-	addEdge(G, 5, 1);
-	BFS(G, 2);
-	//addEdge(G, 4, 5);
-	printGraph(stdout, G);
+	addEdge(G, 2, 4);
+	addEdge(G, 3, 4);
+	addEdge(G, 4, 2);
+	addEdge(G, 4, 3);
+	BFS(G, 1);
+	List L = newList();
+	getPath(L, G, 4);	
+	printList(stdout, L);
+	printf("\n");
+	//printGraph(stdout, G);
 	freeGraph(&G);
 	return 0;
 }
