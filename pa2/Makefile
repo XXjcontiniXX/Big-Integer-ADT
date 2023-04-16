@@ -12,11 +12,11 @@
 # make checkFindPath    checks FindPath for memory errors
 #------------------------------------------------------------------------------
 
-FindPath : FindPath.o Graph.o
-	gcc -std=c17 -Wall -o FindPath FindPath.o Graph.o
+FindPath : FindPath.o Graph.o List.o
+	gcc -std=c17 -Wall -o FindPath FindPath.o Graph.o List.o
 
-GraphTest: GraphTest.o Graph.o
-	gcc -std=c17 -Wall -o GraphTest GraphTest.o Graph.o
+GraphTest: GraphTest.o Graph.o List.o
+	gcc -std=c17 -Wall -o GraphTest GraphTest.o Graph.o List.o
 
 FindPath.o : FindPath.c Graph.h
 	gcc -std=c17 -Wall -c FindPath.c
@@ -34,7 +34,8 @@ clean :
 	rm -f Lex GraphTest FindPath FindPath.o Graph.o List.o GraphTest.o
 
 checkTest :
-	valgrind --leak-check=full GraphTest
+	make GraphTest
+	valgrind --leak-check=full ./GraphTest
 
 checkFindPath :
 	valgrind --leak-check=full FindPath in3 blah3
