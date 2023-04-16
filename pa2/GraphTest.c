@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
 	addEdge(G, 1, 3);
 	addEdge(G, 1, 5);
 	addEdge(G, 5, 1);
+	BFS(G, 2);
 	//addEdge(G, 4, 5);
 	printGraph(stdout, G);
 	freeGraph(&G);

@@ -15,6 +15,9 @@
 
 #define INF -1
 #define NIL 0
+#define white 0
+#define gray 1
+#define black 2
 
 
 typedef struct GraphObj* Graph;
