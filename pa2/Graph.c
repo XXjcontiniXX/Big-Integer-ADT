@@ -97,15 +97,11 @@ int getDist(Graph G, int u) {
       printf("Graph Error: calling getDist() on NULL Graph reference\n");
       exit(EXIT_FAILURE);
    }
-	if ( !(getSource(G) != NIL) ) {
-      printf("Graph Error: calling getDist() without calling BFS() first\n");
-      exit(EXIT_FAILURE);
-   }
 	if ( !(u > 0 && u <= getOrder(G)) ) {
       printf("Graph Error: calling getDist() with an invalid vertex\n");
       exit(EXIT_FAILURE);
    }
-	return (G->d)[u];
+	return getSource(G) == NIL ? INF : (G->d)[u];
 }
 
 void getPath(List L, Graph G, int u) {
