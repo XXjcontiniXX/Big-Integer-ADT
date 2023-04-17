@@ -120,8 +120,8 @@ void getPath(List L, Graph G, int u) {
 	if ( u == getSource(G) ) {
 		append(L, getSource(G));
 	} else if ( (G->p)[u] == NIL ) {
-		printf("%d is not reachable from %d.\n", u, getSource(G));
-		exit(EXIT_FAILURE);
+		clear(L);
+		append(L, NIL);
 	} else {
 		getPath(L, G, (G->p)[u]);
 		append(L, u);
