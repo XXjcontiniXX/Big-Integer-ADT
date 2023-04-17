@@ -210,7 +210,7 @@ void BFS(Graph G, int s) {
 		}
 		(G->wgb)[x] = black; // Do this full thing for every element in the graph, so ixnay this one
 	}
-
+	freeList(&Q);
 }
 
 /*** Other operations ***/

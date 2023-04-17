@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
 	printList(stdout, L);
 	printf("\n");
 	//printGraph(stdout, G);
+	freeList(&L);
 	freeGraph(&G);
 	return 0;
 }
