@@ -123,9 +123,9 @@ void getPath(List L, Graph G, int u) {
 	}
 	if ( u == getSource(G) ) {
 		append(L, getSource(G));
-		return;
 	} else if ( (G->p)[u] == NIL ) {
 		printf("%d is not reachable from %d.\n", u, getSource(G));
+		exit(EXIT_FAILURE);
 	} else {
 		getPath(L, G, (G->p)[u]);
 		append(L, u);
@@ -180,6 +180,7 @@ void addArc(Graph G, int u, int v) {
    }else{
       append(uList, v); // see above
    }
+	G->size += 1;
 }
 
 void BFS(Graph G, int s) {
