@@ -194,10 +194,13 @@ void BFS(Graph G, int s) {
 	List Q = newList(); // start the queue
 	append(Q, s); // add source to the queue
 	while ( length(Q) != 0 ) {
+		//printf("%dth vertex's adj List\n",);
 		int x = (int)front(Q); // dequeue front
 		deleteFront(Q); // ^^
 		List L = (G->adj)[x]; // cache x adj List
-		moveFront(L); // start at beginning
+		if ( length(L) > 0 ) { // Length 
+			moveFront(L); // start at beginning
+		}
 		while ( index(L) != -1 ) { // while we havent seen every elemet in x adj List
 			int y = get(L); // starting at y in x's L
 			if ( (G->wgb)[y] == white ) { // this adj member hasnt been visited then
