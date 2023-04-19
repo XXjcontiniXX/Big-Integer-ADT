@@ -72,7 +72,7 @@ int main(int argc, char* argv[]){
 			BFS(G, source);
 			getPath(L, G, destination);
 			fprintf(out, "The distance from %d to %d is ", source, destination);
-			if ( length(L) - 1 == 0 ) {
+			if ( length(L) - 1 == 0 && source != destination ) {
 				fprintf(out, "infinity\n");
 				fprintf(out, "No %d-%d path exists\n", source, destination);
 			}else{
