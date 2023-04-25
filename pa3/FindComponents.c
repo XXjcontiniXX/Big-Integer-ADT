@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
 	}
 	moveBack(L);
 
-	fprintf(out, "G contains %d strongly connected components\n", comp_num);
+	fprintf(out, "G contains %d strongly connected components:\n", comp_num);
 	for (int i = 1; i <= comp_num; i++) {
 		fprintf(out, "Component %d: ", i);
 		clear(T);
