@@ -5,11 +5,11 @@
 #------------------------------------------------------------------------------
 # Makefile for CSE 101 Programming Assignment 3
 #
-# make                  makes FindPath
+# make                  makes FindComponents
 # make GraphTest        makes GraphTest
 # make clean            removes all binaries
 # make checkTest        checks GraphTest for memory errors
-# make checkFindComponents    checks FindPath for memory errors
+# make checkFindComponents    checks FindComponents for memory errors
 #------------------------------------------------------------------------------
 
 FindComponents: FindComponents.o Graph.o List.o

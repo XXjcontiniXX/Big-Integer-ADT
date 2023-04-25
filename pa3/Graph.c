@@ -215,11 +215,22 @@ Graph transpose(Graph G) {
 	}
 	return F; 
 }
-/*
+
 Graph copyGraph(Graph G) {
-	
+	Graph F = newGraph(getOrder(G));
+	for (int i = 1; i <= getOrder(G); i++) { // dont wanna hit 0 :)
+   	freeList(&((F->adj)[i])); // get rid of empty list
+
+		(F->adj)[i] = copyList((G->adj)[i]); // replace it with a new list
+		(F->wgb)[i] = (G->wgb)[i];
+		(F->p)[i] = (G->p)[i];
+		(F->d)[i] = (G->d)[i];
+		(F->f)[i] = (G->f)[i];
+		F->size = G->size;
+   }
+	return F;
 }
-*/
+
 void printGraph(FILE* out, Graph G) {
 	for (int i = 1; i <= getOrder(G); i++) {
 		fprintf(out, "%d: ", i);

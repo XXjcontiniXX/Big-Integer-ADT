@@ -1,5 +1,5 @@
-# James Contini / jcontini / pa2
-## USAGE: `./FindPath <file in> <file out>`
+# James Contini / jcontini / pa3
+## USAGE: `./FindComponents <file in> <file out>`
 
 ### List.h
  List.h is a C header which prototypes all of List.c's public functions and types for the List ADT.
@@ -12,7 +12,7 @@
 ### Graph.c
  Graph.c is a C file which contains all of the public and private Graph utility functions.
 ### FindPath.c
- FindPath.c is the main program file. FindPath.c handles all FileIO and uses the Graph.h's functions to find the shortest path between two verticies in a graph.
+ FindComponents.c is the main program file. FindPath.c handles all FileIO and uses the Graph.h's functions to find the strongly connected components of a graph..
 ### README.md
  This file contains a description of the repository and of each file.
 ### Makefile

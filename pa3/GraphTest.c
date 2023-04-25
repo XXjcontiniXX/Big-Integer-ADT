@@ -39,10 +39,11 @@ int main(int argc, char* argv[]) {
 	DFS(G, L);
 	//printList(stdout, L);	
 	Graph Gt = transpose(G);
+	Graph Gtt = copyGraph(Gt);
 	/*printf("\n");
 	printGraph(stdout, F);
 	*/
-	DFS(Gt, L);
+	DFS(Gtt, L);
 	printList(stdout, L); // L has the answer in it
 	// start from moveBack and movePrev until getParent() is NIL then the tree is done
 	return 0;
