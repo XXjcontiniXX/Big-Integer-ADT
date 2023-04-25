@@ -9,17 +9,17 @@
 # make GraphTest        makes GraphTest
 # make clean            removes all binaries
 # make checkTest        checks GraphTest for memory errors
-# make checkFindPath    checks FindPath for memory errors
+# make checkFindComponents    checks FindPath for memory errors
 #------------------------------------------------------------------------------
 
-FindPath : FindPath.o Graph.o List.o
-	gcc -std=c17 -Wall -o FindPath FindPath.o Graph.o List.o
+FindComponents: FindComponents.o Graph.o List.o
+	gcc -std=c17 -Wall -o FindComponents FindComponents.o Graph.o List.o
 
 GraphTest: GraphTest.o Graph.o List.o
 	gcc -std=c17 -Wall -o GraphTest GraphTest.o Graph.o List.o
 
-FindPath.o : FindPath.c Graph.h
-	gcc -std=c17 -Wall -c FindPath.c
+FindComponents.o : FindComponents.c Graph.h
+	gcc -std=c17 -Wall -c FindComponents.c
 
 List.o : List.c List.h
 	gcc -std=c17 -Wall -c List.c
@@ -31,11 +31,11 @@ GraphTest.o : GraphTest.c Graph.h
 	gcc -std=c17 -Wall -c GraphTest.c
 
 clean :
-	rm -f Lex GraphTest FindPath FindPath.o Graph.o List.o GraphTest.o
+	rm -f Lex GraphTest FindComponents FindComponents.o Graph.o List.o GraphTest.o
 
 checkTest :
 	make GraphTest
 	valgrind --leak-check=full ./GraphTest
 
-checkFindPath :
-	valgrind --leak-check=full FindPath in3 blah3
+checkFindComponents :
+	valgrind --leak-check=full ./FindComponents in3 blah3

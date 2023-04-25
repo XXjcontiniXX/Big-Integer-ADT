@@ -44,62 +44,61 @@ int main(int argc, char* argv[]){
       G = newGraph(atoi(line));
       break;
    }
-
-	bool print = false;
-   List L = newList();
-   while( fgets(line, MAX_LEN, in) != NULL)  {
-
-      sscanf(line, "%d %d", &source, &destination);
-
-      //printf("source: %d, destination: %d", source, destination);
-
-      if ( source + destination == 0) {
-         if (print == true) {
-            return 0;
-         }
-         print = true;
-         printGraph(out, G);
-         fprintf(out, "\n");
-         continue;
+   
+	while( fgets(line, MAX_LEN, in) != NULL)  {
+		sscanf(line, "%d %d", &source, &destination);
+		if (source + destination == 0) {
+         break;
       }
-
-      if (!print) {
-         addEdge(G, source, destination);
-      }
-
-      if (print) {
-         BFS(G, source);
-         getPath(L, G, destination);
-         fprintf(out, "The distance from %d to %d is ", source, destination);
-         if ( length(L) - 1 == 0 && source != destination ) {
-            fprintf(out, "infinity\n");
-            fprintf(out, "No %d-%d path exists\n", source, destination);
-         }else{
-            fprintf(out, "%d\n", length(L) - 1);
-            fprintf(out, "A shortest %d-%d path is: ", source, destination);
-            printList(out, L);
-            fprintf(out, "\n");
-         }
-
-         fprintf(out, "\n");
-         clear(L);
-      }
-         // when 0 0 occurs, we have to switch from addEdging to BFS and getPath
+		//printf("source: %d, destination: %d", source, destination);
+		addArc(G, source, destination);
    }
-   return 0;
 
-
-	   List L = newList();
-   for (int i = 1; i < 9; i++) {
+	List L = newList();
+	List T = newList();
+   for (int i = 1; i <= getOrder(G); i++) {
       append(L, i);
    }
    DFS(G, L);
-   //printList(stdout, L);
    Graph Gt = transpose(G);
-   /*printf("\n");
-   printGraph(stdout, F);
-   */
    DFS(Gt, L);
-   printList(stdout, L); // L has the answer in it
+	
+	fprintf(out, "Adjacency list representation of G:\n");
+	printGraph(out, G);
+	fprintf(out, "\n");	
+
+	int comp_num = 0;
+	moveBack(L);
+	while ( index(L) != -1 ) {
+		if ( getParent(Gt, (int)get(L)) == NIL) {
+			comp_num += 1;
+		}
+		movePrev(L);
+	}
+	moveBack(L);
+
+	fprintf(out, "G contains %d strongly connected components\n", comp_num);
+	for (int i = 1; i <= comp_num; i++) {
+		fprintf(out, "Component %d: ", i);
+		clear(T);
+		
+		while ( index(L) != -1 ) {
+			prepend(T, get(L));
+      	if ( getParent(Gt, (int)get(L)) == NIL) {
+				printList(out, T);
+				printf("get(L) = %d\n", get(L));
+				fprintf(out, "\n");
+				movePrev(L);
+				break;
+			}
+      	movePrev(L);
+   	}	
+	}
+
+	freeGraph(&Gt);
+	freeGraph(&G);
+	freeList(&L);
+	freeList(&T);
+	return 0;
    // start from moveBack and movePrev until getParent() is NIL then the tree is don	
 }
