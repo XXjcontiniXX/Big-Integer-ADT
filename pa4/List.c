@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include "Matrix.h"
 #include "List.h"
 
 // structs --------------------------------------------------------------------
@@ -175,22 +176,19 @@ bool equals(List A, List B) {
    if ((length(A) == 0) || (length(B) == 0)) { // if length a or b is zero and we know the lengths dont equal then its false
    	return false;
    }
-   List tA = copyList(A); // create copies // I need to make a function for this LOL
-   List tB = copyList(B); // ^^^ 		// FORGOT ABOUT THAT HAHA		
-	
-   moveBack(tA); // move cursor to end
-   moveBack(tB); // ^^^
-   while ( !(index(tA) < 0) ) { // while cursor is defined
-      if (get(tA) != get(tB)) { // see if the elements are equivalent
-	 freeList(&tA);
-	 freeList(&tB);
+	ListElement Ac = A->cursor;
+	ListElement Bc = B->cursor;
+   moveBack(A); // move cursor to end
+   moveBack(B); // ^^^
+   while ( index(A) != -1 ) { // while cursor is defined
+      if ( !entryCmp(A, B) ) { // see if the elements are equivalent
          return false; // if not return false
       }
-      movePrev(tA); // continue to move towards front 
-      movePrev(tB); // ^^^
+      movePrev(A); // continue to move towards front 
+      movePrev(B); // ^^^
    }
-   freeList(&tA);
-   freeList(&tB);
+	A->cursor = Ac;
+	B->cursor = Bc;
    return true; // iff same length, same cursor index, same elements in same spots, they're equivalent
 
 }

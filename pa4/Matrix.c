@@ -72,13 +72,59 @@ int NNZ(Matrix M) {
    }
 	return M->nze;
 }
+
+int rowCmp(List A, List B) {
+	if (A == NULL && B != NULL) { return 0; }
+	if (A != NULL && B == NULL) { return 0; }
+	moveFront(A);
+	moveFront(B);
+	if (length(A) - length(B) != 0) {
+		return 0;
+	}
+	while (index(A) != -1) {
+		Entry Aa = get(A);
+		Entry Bb = get(B);
+		uint8_t r = ( (Aa->r) == (Bb->r) );
+		uint8_t c = ( (Aa->c) == (Bb->c) );
+		uint8_t val = ( (Aa->val) == (Bb->val) );
+		if ( r + c + val < 3 ) { // if any condition is not 
+			return 0;
+		}
+		moveNext(A);
+		moveNext(B);
+	}
+	return 1;
+}
+
 // equals()
 // Return true (1) if matrices A and B are equal, false (0) otherwise.
-int equals(Matrix A, Matrix B);
+int equals(Matrix A, Matrix B) {
+	if ( size(A) != size(B)) {
+		return 0;
+	}
+	
+   for (int i = 0; i < size(A); i++) {
+		if ((A->lists)[i] == NULL && (B->lists)[i] == NULL) { continue; } 
+      if ( !rowCmp( (A->lists)[i], (B->lists[i])) ) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
 // Manipulation procedures
 // makeZero()
 // Re-sets M to the zero Matrix state.
-void makeZero(Matrix M);
+void makeZero(Matrix M) {
+	if( M==NULL ){
+      fprintf(stderr, "Matrix Error: calling makeZero() on NULL Matrix reference\n");
+      exit(EXIT_FAILURE);
+   }
+	for (int i = 0; i < size(M); i++) {
+		if ((M->lists)[i] == NULL) {continue;}
+		freeList( &((M->lists)[i]) );
+	}
+}
 // changeEntry()
 // Changes the ith row, jth column of M to the value x.
 // Pre: 1<=i<=size(M), 1<=j<=size(M)
@@ -87,7 +133,12 @@ void changeEntry(Matrix M, int i, int j, double x) {
       fprintf(stderr, "Matrix Error: calling changeEntry() on NULL Matrix reference\n");
       exit(EXIT_FAILURE);
    }
-
+	
+	if( !(i > 0 && j > 0 && i <= size(M) && j <= size(M)) ){
+      fprintf(stderr, "Matrix Error: calling changeEntry() with invalid row or column values\n");
+      exit(EXIT_FAILURE);
+   }
+	
 	Entry E;						    // E will cache every entry
 	if ((M->lists)[i-1] == NULL) {
 		(M->lists)[i-1] = newList();
@@ -231,7 +282,49 @@ Matrix sum(Matrix A, Matrix B) {
 // diff()
 // Returns a reference to a new Matrix object representing A-B.
 // pre: size(A)==size(B)
-Matrix diff(Matrix A, Matrix B);
+Matrix diff(Matrix A, Matrix B) {
+	if( A==NULL || B==NULL){
+      fprintf(stderr, "Matrix Error: calling sum() on NULL Matrix reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( size(A) != size(B) ){
+      fprintf(stderr, "Matrix Error: calling sum() on Matricies of different dimensions\n");
+      exit(EXIT_FAILURE);
+   }
+   Entry Ea = NULL;
+   Entry Eb = NULL;
+   Matrix M = newMatrix(size(A));
+
+   for (int i = 0; i < size(A); i++) {
+      if ( (A->lists)[i] == NULL && (B->lists)[i] == NULL ) {continue;} // if null then do nothin
+      if ((A->lists)[i] == NULL) { // if A null then set M's entry to B's entry // cuz an entry plus 0 equals the entry
+         M->lists[i] = copyList( (B->lists)[i] );
+         continue;
+      }
+      if ((B->lists)[i] == NULL) { // if B row null set M's entire row to A's row
+         M->lists[i] = copyList( (A->lists)[i] );
+         continue;
+      }
+
+      moveFront((A->lists)[i]);
+      moveFront((B->lists)[i]);
+
+      while ( index((A->lists)[i]) != -1 ) {
+         Ea = get( (A->lists)[i] );
+         changeEntry(M, Ea->r, Ea->c, Ea->val);
+         moveNext((A->lists)[i]);
+      }
+
+      while ( index((B->lists)[i]) != -1 ) {
+         Eb = get((B->lists)[i]);
+         modEntry(M, 's', Eb->r, Eb->c, Eb->val); // add entries together
+         moveNext((B->lists)[i]);
+      }
+
+   }
+   return M;
+
+}
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
@@ -255,6 +348,7 @@ void printMatrix(FILE* out, Matrix M) {
    }
 	return;
 }
+
 
 void printEntry(FILE* out, Entry E) {
 	fprintf(out, "(%d, %lf) ", E->c, E->val);
