@@ -5,6 +5,7 @@
 #include"Matrix.h"
      
 int main(int argc, char* argv[]){
+	/*	
 	Matrix M = newMatrix(3);
 	Matrix Mp = newMatrix(3);
 	Matrix T1 = newMatrix(4);
@@ -40,6 +41,24 @@ int main(int argc, char* argv[]){
    changeEntry(T2, 1, 3, 3);
    changeEntry(T2, 2, 3, 3);
 	assert(equals(T1, T2));
+	*/
+	Matrix P = newMatrix(3);
+	changeEntry(P, 1, 2, 3);
+	changeEntry(P, 1, 3, 3);
+	changeEntry(P, 2, 3, 3);
+	
+	Matrix Pl = newMatrix(3);
+	changeEntry(Pl, 3, 1, 3);
+   changeEntry(Pl, 3, 2, 3);
+   changeEntry(Pl, 2, 1, 3);
+	
+	printMatrix(stdout, P);
+	printf("\n");
+	printMatrix(stdout, Pl);
+	printf("\n");
+	printMatrix(stdout, product(P, Pl));
+
+	//printMatrix(stdout, transpose(P));
 	//assert(NNZ(M) == 3);
 	//printMatrix(stdout, M);
 	//printf("\n");

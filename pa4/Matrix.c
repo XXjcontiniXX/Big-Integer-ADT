@@ -22,6 +22,7 @@ typedef struct MatrixObj {
 
 
 void printEntry(FILE* out, Entry E);
+double vectorDot(List P, List Q);
 
 Entry newEntry(double val, int r, int c) {
    Entry E = (Entry)malloc(sizeof(Entry));
@@ -73,6 +74,16 @@ int NNZ(Matrix M) {
 	return M->nze;
 }
 
+int entryCmp(Entry A, Entry B) {
+	uint8_t r = ( (A->r) == (B->r) );
+	uint8_t c = ( (A->c) == (B->c) );
+   uint8_t val = ( (A->val) == (B->val) );
+   if ( r + c + val < 3 ) { // if any condition is not
+      return 0;
+   }
+	return 1;
+}
+
 int rowCmp(List A, List B) {
 	if (A == NULL && B != NULL) { return 0; }
 	if (A != NULL && B == NULL) { return 0; }
@@ -84,10 +95,7 @@ int rowCmp(List A, List B) {
 	while (index(A) != -1) {
 		Entry Aa = get(A);
 		Entry Bb = get(B);
-		uint8_t r = ( (Aa->r) == (Bb->r) );
-		uint8_t c = ( (Aa->c) == (Bb->c) );
-		uint8_t val = ( (Aa->val) == (Bb->val) );
-		if ( r + c + val < 3 ) { // if any condition is not 
+		if ( entryCmp(Aa, Bb) == 0 ) {
 			return 0;
 		}
 		moveNext(A);
@@ -168,11 +176,38 @@ void changeEntry(Matrix M, int i, int j, double x) {
 // Matrix Arithmetic operations
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
-Matrix copy(Matrix A);
+Matrix copy(Matrix A) {
+	Matrix M = newMatrix(size(A));
+   Entry E = NULL;
+   for (int i = 0; i < size(A); i++) {
+      if ( (A->lists)[i] == NULL ) {continue;}
+      moveFront((A->lists)[i]);
+      while ( index((A->lists)[i]) != -1 ) {
+         E = get((A->lists)[i]);
+         changeEntry(M, E->r, E->c, E->val); // reverse column and row but same val
+         moveNext((A->lists)[i]);
+      }
+   }
+   return M;
+
+}
 // transpose()
 // Returns a reference to a new Matrix object representing the transpose
 // of A.
-Matrix transpose(Matrix A);
+Matrix transpose(Matrix A) {
+	Matrix M = newMatrix(size(A));
+	Entry E = NULL;
+	for (int i = 0; i < size(A); i++) {
+      if ( (A->lists)[i] == NULL ) {continue;}
+		moveFront((A->lists)[i]);
+		while ( index((A->lists)[i]) != -1 ) {
+			E = get((A->lists)[i]);
+			changeEntry(M, E->c, E->r, E->val); // reverse column and row but same val
+			moveNext((A->lists)[i]);
+		}
+	}
+	return M;
+}
 // scalarMult()
 // Returns a reference to a new Matrix object representing xA.
 Matrix scalarMult(double x, Matrix A) {
@@ -223,14 +258,19 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
          return;
       }
       if ( (E->c) == j ) {   // if entry exists combine them 
-         E->val = E->val + x;         // set its val to the new one
+			E->val = E->val + x;         // set its val to the new one
+			if (E->val == 0) {
+				M->nze -= 1;
+			}
          return;             // end the function
       }
 
       moveNext((M->lists)[i-1]);      // moveNext() if wrong column
    }
+	
    append((M->lists)[i-1], newEntry(x, i, j));
    M->nze += 1;
+	
 }
 
 // sum()
@@ -328,7 +368,61 @@ Matrix diff(Matrix A, Matrix B) {
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
-Matrix product(Matrix A, Matrix B);
+Matrix product(Matrix A, Matrix B) {
+	if( A==NULL || B==NULL){
+      fprintf(stderr, "Matrix Error: calling product() on NULL Matrix reference\n");
+      exit(EXIT_FAILURE);
+   }
+   if( size(A) != size(B) ){
+      fprintf(stderr, "Matrix Error: calling product() on Matricies of different dimensions\n");
+      exit(EXIT_FAILURE);
+   }
+
+	Matrix Bt = transpose(B);
+	Matrix prod = newMatrix(size(A));
+	int  vdot;
+	for (int i = 0; i < size(A); i += 1) {
+		for (int j = 0; j < size(Bt); j += 1) {
+			vdot = vectorDot((A->lists)[i], (Bt->lists)[j]);
+			printf("dot product: %d\n", vdot);
+			printList(stdout, (A->lists)[i]);
+			printf("\n");
+			printList(stdout, (Bt->lists)[j]);
+			if ( vdot == 0 ) {continue;}
+      	changeEntry(prod, i+1, j+1, vdot);
+		}		
+	}
+	freeMatrix(&Bt);
+	return prod;
+}
+
+double vectorDot (List L, List Q) {
+	if (L == NULL) {
+		return 0;
+	} 
+	if (Q == NULL ) {
+		return 0;
+	}
+	moveFront(L);
+	Entry El = NULL;
+	Entry Eq = NULL;
+	double sum = 0;	
+
+	while ( index(L) != -1 ) {
+		El = get(L); // start with first element of L
+		moveFront(Q); // start at beginning of Q
+		while ( index(Q) != -1 ) { 
+			Eq = get(Q);
+			if ( (El->r == Eq->r) && (El->c == Eq->c) ) { // if they are the same element
+				sum += El->val * Eq->val;
+				break;
+			}
+			moveNext(Q);
+		}
+		moveNext(L);
+	}
+	return sum;
+} 
 // printMatrix()
 // Prints a string representation of Matrix M to filestream out. Zero rows
 // are not printed. Each non-zero row is represented as one line consisting

@@ -546,7 +546,7 @@ void delete(List L) {
 // string representation of L consisting                                      
 // of a space separated sequence of integers,                                     
 // with front on left.
-/*void printList(FILE* out, List L) {
+void printList(FILE* out, List L) {
    if( L==NULL ){
       printf("List Error: calling printList() on NULL List reference\n");
       exit(EXIT_FAILURE);
@@ -557,12 +557,12 @@ void delete(List L) {
    }
    Node N = L->front;
    do {
-      fprintf(out, "%d ", (int)N->data);
+      printEntry(out, N);
       N = N->next;
    } while (N != NULL);
 }
 
-*/
+
 // Returns a new List representing the same integer                          
 // sequence as L. The cursor in the new list is undefined,                         
 // regardless of the state of the cursor in L. The state                          
