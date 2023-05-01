@@ -323,7 +323,24 @@ Matrix sum(Matrix A, Matrix B) {
 	Entry Ea = NULL;
 	Entry Eb = NULL;
    Matrix M = newMatrix(size(A));
-	
+	if (A == B) {
+		int sum = 0;
+      for (int i = 0; i < size(A); i += 1) {
+			if ((A->lists)[i] == NULL) {
+				continue;
+			}
+		
+			moveFront((A->lists)[i]);
+			while ( index((A->lists)[i]) != -1 ) {
+         	Ea = get((A->lists)[i]);
+				sum = (Ea->val)*2;
+				changeEntry(M, Ea->r, Ea->c, sum);
+				moveNext((A->lists)[i]);
+      	}
+   	}
+		return M;
+	}
+
    for (int i = 0; i < size(A); i++) {
 		if ( (A->lists)[i] == NULL && (B->lists)[i] == NULL ) {continue;} // if null then do nothin
 		if ((A->lists)[i] == NULL) { // if A null then set M's entry to B's entry // cuz an entry plus 0 equals the entry
@@ -366,6 +383,11 @@ Matrix diff(Matrix A, Matrix B) {
       fprintf(stderr, "Matrix Error: calling sum() on Matricies of different dimensions\n");
       exit(EXIT_FAILURE);
    }
+	
+	if (A == B) {
+		Matrix M = newMatrix(size(A));
+		return M;
+	}
    Entry Ea = NULL;
    Entry Eb = NULL;
    Matrix M = newMatrix(size(A));

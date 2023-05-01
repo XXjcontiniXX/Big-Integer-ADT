@@ -47,7 +47,8 @@ int main(int argc, char* argv[]){
 	changeEntry(P, 1, 2, 3);
 	changeEntry(P, 1, 3, 3);
 	changeEntry(P, 2, 3, 3);
-	
+	printMatrix(stdout, diff(P, P));
+	/*
 	Matrix Pl = newMatrix(3);
 	changeEntry(Pl, 3, 1, 3);
    changeEntry(Pl, 3, 2, 3);
@@ -62,6 +63,7 @@ int main(int argc, char* argv[]){
 	freeMatrix(&P);
 	freeMatrix(&Pm);
 	freeMatrix(&Pl);
+	*/
 	//printMatrix(stdout, transpose(P));
 	//assert(NNZ(M) == 3);
 	//printMatrix(stdout, M);
