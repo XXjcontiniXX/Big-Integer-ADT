@@ -153,7 +153,7 @@ void changeEntry(Matrix M, int i, int j, double x) {
       fprintf(stderr, "Matrix Error: calling changeEntry() with invalid row or column values\n");
       exit(EXIT_FAILURE);
    }
-	
+
 	if ((M->lists)[i-1] == NULL) {
 		(M->lists)[i-1] = newList();
 		append((M->lists)[i-1], newEntry(x, i, j));
@@ -165,35 +165,27 @@ void changeEntry(Matrix M, int i, int j, double x) {
 	moveFront((M->lists)[i-1]);
 	while ( index(M->lists[i-1]) != -1 ) {
 		E = get((M->lists)[i-1]);	     // get Entry at some index of row_i	
-		if ( j < E->c ) {
+		if ( j < E->c ) { // if j is immeidtaly behind first column # insertBefore
+			if (x == 0) {return;} // if they wanna put a zero there tho do nothing
 			insertBefore((M->lists)[i-1], newEntry(x, i, j));
-			if (x != 0){M->nze += 1;}
+			M->nze += 1;
 			return;
 		}	
-		if ( (E->c) == j ) {   // if that Entry's column # is correct
-			if (E->val == 0 && x != 0) {
-				E->val = x;
-				M->nze += 1;
-				return;
-			}
-			if (E->val == 0 && x == 0) {
-				return;
-			}
-			if (E->val != 0 && x == 0) {
-				E->val = x;
-				M->nze -= 1;
-			}
-			if (E->val != 0 && x != 0){
-				E->val = x;
-				return;
-			}
-			
-		}
 
+		if ( (E->c) == j ) {   // if that Entry's column # is correct
+			if (x == 0) {
+				delete((M->lists)[i-1]); 
+				M->nze -= 1; // for sure were down a nze cuz there are no zero entries
+			}else{
+				E->val = x;
+			}
+			return;
+		}
 		moveNext((M->lists)[i-1]);		  // moveNext() if wrong column
 	}
-	append((M->lists)[i-1], newEntry(x, i, j));
-	if (x != 0){M->nze += 1;}
+	if (x == 0) {return;} // if we tryna put a zero in do nothing
+	append((M->lists)[i-1], newEntry(x, i, j)); // if we never found the right c append it to end cuz we looked through every one and its not before
+	M->nze += 1
 }
 
 // Matrix Arithmetic operations
@@ -277,35 +269,26 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
    while ( index(M->lists[i-1]) != -1 ) {
       E = get((M->lists)[i-1]);       // get Entry at some index of row_i
 		if ( j < E->c ) {
+			if (x == 0) {return;}
          insertBefore((M->lists)[i-1], newEntry(x, i, j));
-         if (x != 0){M->nze += 1;}
+         M->nze += 1;
          return;
       }
       if ( (E->c) == j ) {   // if entry exists combine them 
-      	if (E->val + x != 0 && E->val == 0) {
-            E->val = E->val + x;
-            M->nze += 1;
-            return;
+			if (E->val + x == 0) {
+            delete((M->lists)[i-1]);
+            M->nze -= 1; // for sure were down a nze cuz there are no zero entries
+         }else{
+            E->val = x;
          }
-         if (E->val + x == 0 && E->val == 0) {
-            return;
-         }
-         if (E->val + x == 0 && E->val != 0) {
-            E->val = E->val + x;
-            M->nze -= 1;
-         }
-         if (E->val + x != 0 && E->val != 0){
-            E->val = E->val + x;
-            return;
-         }
+         return;
 		}
 
       moveNext((M->lists)[i-1]);      // moveNext() if wrong column
    }
-	
+	if (x == 0) {return;}
    append((M->lists)[i-1], newEntry(x, i, j));
-   if (x != 0) {M->nze += 1;}
-	
+   M->nze += 1;
 }
 
 // sum()
