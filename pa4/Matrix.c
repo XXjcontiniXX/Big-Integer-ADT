@@ -155,9 +155,10 @@ void changeEntry(Matrix M, int i, int j, double x) {
    }
 
 	if ((M->lists)[i-1] == NULL) {
+		if (x == 0) {return;}
 		(M->lists)[i-1] = newList();
 		append((M->lists)[i-1], newEntry(x, i, j));
-		if (x != 0){M->nze += 1;}
+		M->nze += 1;
 		return;
 	} // but if its not empty
 
