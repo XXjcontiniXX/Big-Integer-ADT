@@ -138,6 +138,7 @@ void makeZero(Matrix M) {
 		if ((M->lists)[i] == NULL) {continue;}
 		freeList( &((M->lists)[i]) );
 	}
+	M->nze = 0;
 }
 // changeEntry()
 // Changes the ith row, jth column of M to the value x.
@@ -156,28 +157,45 @@ void changeEntry(Matrix M, int i, int j, double x) {
 	if ((M->lists)[i-1] == NULL) {
 		(M->lists)[i-1] = newList();
 		append((M->lists)[i-1], newEntry(x, i, j));
-		M->nze += 1;
+		if (x != 0){M->nze += 1;}
 		return;
 	} // but if its not empty
+
 	Entry E = NULL;	
 	moveFront((M->lists)[i-1]);
 	while ( index(M->lists[i-1]) != -1 ) {
 		E = get((M->lists)[i-1]);	     // get Entry at some index of row_i	
 		if ( j < E->c ) {
 			insertBefore((M->lists)[i-1], newEntry(x, i, j));
-			M->nze += 1;
+			if (x != 0){M->nze += 1;}
 			return;
 		}	
 		if ( (E->c) == j ) {   // if that Entry's column # is correct
-			E->val = x;			  // set its val to the new one
-			return;				  // end the function
+			if (E->val == 0 && x != 0) {
+				E->val = x;
+				M->nze += 1;
+				return;
+			}
+			if (E->val == 0 && x == 0) {
+				return;
+			}
+			if (E->val != 0 && x == 0) {
+				E->val = x;
+				M->nze -= 1;
+			}
+			if (E->val != 0 && x != 0){
+				E->val = x;
+				return;
+			}
+			
 		}
 
 		moveNext((M->lists)[i-1]);		  // moveNext() if wrong column
 	}
 	append((M->lists)[i-1], newEntry(x, i, j));
-	M->nze += 1;
+	if (x != 0){M->nze += 1;}
 }
+
 // Matrix Arithmetic operations
 // copy()
 // Returns a reference to a new Matrix object having the same entries as A.
@@ -213,6 +231,7 @@ Matrix transpose(Matrix A) {
 	}
 	return M;
 }
+
 // scalarMult()
 // Returns a reference to a new Matrix object representing xA.
 Matrix scalarMult(double x, Matrix A) {
@@ -241,7 +260,7 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
       exit(EXIT_FAILURE);
    }
 
-   Entry E;    // E will cache every entry
+   Entry E = NULL;    // E will cache every entry
    if ((M->lists)[i-1] == NULL) {
       fprintf(stderr, "Matrix Error: calling modEntry() on row that doesn't exist\n");
       exit(EXIT_FAILURE);
@@ -259,22 +278,33 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
       E = get((M->lists)[i-1]);       // get Entry at some index of row_i
 		if ( j < E->c ) {
          insertBefore((M->lists)[i-1], newEntry(x, i, j));
-         M->nze += 1;
+         if (x != 0){M->nze += 1;}
          return;
       }
       if ( (E->c) == j ) {   // if entry exists combine them 
-			E->val = E->val + x;         // set its val to the new one
-			if (E->val == 0) {
-				M->nze -= 1;
-			}
-         return;             // end the function
-      }
+      	if (E->val + x != 0 && E->val == 0) {
+            E->val = E->val + x;
+            M->nze += 1;
+            return;
+         }
+         if (E->val + x == 0 && E->val == 0) {
+            return;
+         }
+         if (E->val + x == 0 && E->val != 0) {
+            E->val = E->val + x;
+            M->nze -= 1;
+         }
+         if (E->val + x != 0 && E->val != 0){
+            E->val = E->val + x;
+            return;
+         }
+		}
 
       moveNext((M->lists)[i-1]);      // moveNext() if wrong column
    }
 	
    append((M->lists)[i-1], newEntry(x, i, j));
-   M->nze += 1;
+   if (x != 0) {M->nze += 1;}
 	
 }
 
