@@ -185,7 +185,7 @@ void changeEntry(Matrix M, int i, int j, double x) {
 	}
 	if (x == 0) {return;} // if we tryna put a zero in do nothing
 	append((M->lists)[i-1], newEntry(x, i, j)); // if we never found the right c append it to end cuz we looked through every one and its not before
-	M->nze += 1
+	M->nze += 1;
 }
 
 // Matrix Arithmetic operations
