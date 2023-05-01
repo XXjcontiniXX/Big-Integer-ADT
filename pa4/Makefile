@@ -21,3 +21,7 @@ List.o: List.c List.h
 
 clean: 
 	rm -r -f *.o 
+
+checkTest :
+	make MatrixTest
+	valgrind --leak-check=full ./MatrixTest

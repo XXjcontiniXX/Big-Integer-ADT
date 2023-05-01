@@ -57,7 +57,11 @@ int main(int argc, char* argv[]){
 	printf("\n");
 	printMatrix(stdout, Pl);
 	printf("\n");
-	printMatrix(stdout, product(P, Pl));
+	Matrix Pm = product(P, Pl);
+	printMatrix(stdout, Pm);
+	freeMatrix(&P);
+	freeMatrix(&Pm);
+	freeMatrix(&Pl);
 	//printMatrix(stdout, transpose(P));
 	//assert(NNZ(M) == 3);
 	//printMatrix(stdout, M);

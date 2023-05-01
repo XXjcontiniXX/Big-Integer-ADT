@@ -25,7 +25,7 @@ void printEntry(FILE* out, Entry E);
 double vectorDot(List P, List Q);
 
 Entry newEntry(double val, int r, int c) {
-   Entry E = (Entry)malloc(sizeof(Entry));
+   Entry E = (Entry)malloc(sizeof(EntryObj));
    if (E == NULL) {fprintf(stderr, "Entry Error: newEntry allocation failed"); exit(EXIT_FAILURE);}
 	E->val = val;
    E->r = r;
@@ -36,25 +36,26 @@ Entry newEntry(double val, int r, int c) {
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
 Matrix newMatrix(int n) {
-	Matrix M = (Matrix)malloc(sizeof(Matrix));
+	Matrix M = (Matrix)malloc(sizeof(MatrixObj));
 	if (M == NULL) {fprintf(stderr, "Matrix Error: newMatrix allocation failed"); exit(EXIT_FAILURE);}
-	printf("boutta make a matrix\n");
 	M->lists = (List*)malloc(n*sizeof(List));
-	printf("j made a matrix\n");
+	for (int i = 0; i < n; i += 1) {
+		(M->lists)[i] = NULL;
+	}
 	M->nze = 0;
 	M->dim = n;
-	
 	return M;
 }
 
 // freeMatrix()
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM) {
-	for (int i = 0; i < (*pM)->dim; i++) {
+	for (int i = 0; i < (*pM)->dim; i += 1) {
 		if ( ((*pM)->lists)[i] != NULL ) {
 			freeList( &(((*pM)->lists)[i]) );
 		}
 	}
+	free((*pM)->lists);
 	free(*pM);
 	*pM = NULL;
 	return;
@@ -152,14 +153,13 @@ void changeEntry(Matrix M, int i, int j, double x) {
       exit(EXIT_FAILURE);
    }
 	
-	Entry E;						    // E will cache every entry
 	if ((M->lists)[i-1] == NULL) {
 		(M->lists)[i-1] = newList();
 		append((M->lists)[i-1], newEntry(x, i, j));
 		M->nze += 1;
 		return;
 	} // but if its not empty
-	
+	Entry E = NULL;	
 	moveFront((M->lists)[i-1]);
 	while ( index(M->lists[i-1]) != -1 ) {
 		E = get((M->lists)[i-1]);	     // get Entry at some index of row_i	
