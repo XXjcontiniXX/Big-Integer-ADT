@@ -354,7 +354,6 @@ Matrix diff(Matrix A, Matrix B) {
          changeEntry(M, Ea->r, Ea->c, Ea->val);
          moveNext((A->lists)[i]);
       }
-
       while ( index((B->lists)[i]) != -1 ) {
          Eb = get((B->lists)[i]);
          modEntry(M, 's', Eb->r, Eb->c, Eb->val); // add entries together
@@ -384,10 +383,6 @@ Matrix product(Matrix A, Matrix B) {
 	for (int i = 0; i < size(A); i += 1) {
 		for (int j = 0; j < size(Bt); j += 1) {
 			vdot = vectorDot((A->lists)[i], (Bt->lists)[j]);
-			printf("dot product: %d\n", vdot);
-			printList(stdout, (A->lists)[i]);
-			printf("\n");
-			printList(stdout, (Bt->lists)[j]);
 			if ( vdot == 0 ) {continue;}
       	changeEntry(prod, i+1, j+1, vdot);
 		}		
@@ -413,7 +408,7 @@ double vectorDot (List L, List Q) {
 		moveFront(Q); // start at beginning of Q
 		while ( index(Q) != -1 ) { 
 			Eq = get(Q);
-			if ( (El->r == Eq->r) && (El->c == Eq->c) ) { // if they are the same element
+			if ( El->c == Eq->c ) { // if they are the same element
 				sum += El->val * Eq->val;
 				break;
 			}

@@ -555,11 +555,11 @@ void printList(FILE* out, List L) {
       printf("List Error: calling printList() on an empty List\n");
       exit(EXIT_FAILURE);
    }
-   Node N = L->front;
-   do {
-      printEntry(out, N);
-      N = N->next;
-   } while (N != NULL);
+   moveFront(L);
+   while (index(L) != -1) {
+		printEntry(out, get(L));
+		moveNext(L);
+   } 
 }
 
 

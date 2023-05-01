@@ -42,6 +42,7 @@ int main(int argc, char* argv[]){
    changeEntry(T2, 2, 3, 3);
 	assert(equals(T1, T2));
 	*/
+	
 	Matrix P = newMatrix(3);
 	changeEntry(P, 1, 2, 3);
 	changeEntry(P, 1, 3, 3);
@@ -57,7 +58,6 @@ int main(int argc, char* argv[]){
 	printMatrix(stdout, Pl);
 	printf("\n");
 	printMatrix(stdout, product(P, Pl));
-
 	//printMatrix(stdout, transpose(P));
 	//assert(NNZ(M) == 3);
 	//printMatrix(stdout, M);
