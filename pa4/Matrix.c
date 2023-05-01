@@ -38,9 +38,12 @@ Entry newEntry(double val, int r, int c) {
 Matrix newMatrix(int n) {
 	Matrix M = (Matrix)malloc(sizeof(Matrix));
 	if (M == NULL) {fprintf(stderr, "Matrix Error: newMatrix allocation failed"); exit(EXIT_FAILURE);}
+	printf("boutta make a matrix\n");
 	M->lists = (List*)malloc(n*sizeof(List));
+	printf("j made a matrix\n");
 	M->nze = 0;
 	M->dim = n;
+	
 	return M;
 }
 
@@ -48,7 +51,9 @@ Matrix newMatrix(int n) {
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM) {
 	for (int i = 0; i < (*pM)->dim; i++) {
-		freeList( &((*pM)->lists)[i] );
+		if ( ((*pM)->lists)[i] != NULL ) {
+			freeList( &(((*pM)->lists)[i]) );
+		}
 	}
 	free(*pM);
 	*pM = NULL;
