@@ -440,7 +440,7 @@ void printMatrix(FILE* out, Matrix M) {
 
 
 void printEntry(FILE* out, Entry E) {
-	fprintf(out, "(%d, %lf) ", E->c, E->val);
+	fprintf(out, "(%d, %.1lf) ", E->c, E->val);
 }
 
 
