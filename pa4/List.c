@@ -223,7 +223,7 @@ void set(List L, ListElement x) {
       printf("List Error: calling set() on a List with an undefined cursor\n");
       exit(EXIT_FAILURE);
    }
-   L->cursor->data = (ListElement)x;
+   L->cursor->data = x;
    return;
 }
 
@@ -303,7 +303,7 @@ void prepend(List L, ListElement x) {
       printf("List Error: calling prepend() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-	Node N = newNode((ListElement)x);
+	Node N = newNode(x);
    if ( length(L) == 0 ) {
       L->back = N;
       L->front = N;
@@ -335,7 +335,7 @@ void append(List L, ListElement x){
       printf("List Error: calling append() on NULL List reference\n");
       exit(EXIT_FAILURE);
    }
-   Node N = newNode((ListElement)x);
+   Node N = newNode(x);
 
    if ( length(L) == 0 ) {
       L->back = N;
@@ -376,7 +376,7 @@ void insertBefore(List L, ListElement x) {
 		return;
 	}
 	
-	Node N = newNode((ListElement)x);
+	Node N = newNode(x);
 	N->index = index(L); // set the new node's index to the cursor
    N->prev = L->cursor->prev;
    N->next = L->cursor;
@@ -411,7 +411,7 @@ void insertAfter(List L, ListElement x) {
       return;
    }
 	
-   Node N = newNode((ListElement)x);
+   Node N = newNode(x);
    N->index = index(L) + 1; // set the new node's index to the cursor
 	N->prev = L->cursor; 
 	N->next = L->cursor->next;
