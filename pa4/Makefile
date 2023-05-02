@@ -1,35 +1,65 @@
-# Makefile for pa4
-# jcontini
-# James Contini
-# jaja
+# Makefile for CSE 101 Programming Assignment 4
+#
+#  make                     makes Sparse
+#  make MatrixTest          makes MatrixTest
+#  make ListTest            makes ListTest
+#  make clean               removes all binaries
+#  make SparseCheck         runs Sparse in valgrind on in5
+#  make MatrixCheck         runs MatrixTest in valgrind
+#  make ListCheck           runs ListTest in valgrind
+#------------------------------------------------------------------------------
 
-Sparse: Sparse.o Matrix.o List.o
-	gcc -std=c17 -Wall -o Sparse Sparse.o List.o Matrix.o
+MAIN           = Sparse
+ADT1           = Matrix
+ADT2           = List
+SOURCE         = $(MAIN).c
+OBJECT         = $(MAIN).o
+ADT1_TEST      = $(ADT1)Test
+ADT1_SOURCE    = $(ADT1).c
+ADT1_OBJECT    = $(ADT1).o
+ADT1_HEADER    = $(ADT1).h
+ADT2_TEST      = $(ADT2)Test
+ADT2_SOURCE    = $(ADT2).c
+ADT2_OBJECT    = $(ADT2).o
+ADT2_HEADER    = $(ADT2).h
+COMPILE        = gcc -std=c17 -Wall -c
+LINK           = gcc -std=c17 -Wall -o
+REMOVE         = rm -f
+MEMCHECK       = valgrind --leak-check=full
 
-Sparse.o: Sparse.c Matrix.h
-	gcc -std=c17 -Wall -c Sparse.c
+$(MAIN): $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
+	$(LINK) $(MAIN) $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
 
-MatrixTest: MatrixTest.o List.o Matrix.o
-	gcc -std=c17 -Wall -o MatrixTest MatrixTest.o List.o Matrix.o
+$(ADT1_TEST): $(ADT1_TEST).o $(ADT1_OBJECT) $(ADT2_OBJECT)
+	$(LINK) $(ADT1_TEST) $(ADT1_TEST).o $(ADT1_OBJECT) $(ADT2_OBJECT)
 
-Matrix.o: Matrix.c Matrix.h
-	gcc -std=c17 -Wall -c Matrix.c
+$(ADT2_TEST): $(ADT2_TEST).o $(ADT2_OBJECT)
+	$(LINK) $(ADT2_TEST) $(ADT2_TEST).o $(ADT2_OBJECT)
 
-MatrixList.o: MatrixTest.c Matrix.h
-	gcc -std=c17 -Wall -c MatrixTest.c
-	
-ListTest: ListTest.o List.o
-	gcc -std=c17 -Wall -o ListTest ListTest.o List.o
+$(OBJECT): $(SOURCE) $(ADT1_HEADER) $(ADT2_HEADER)
+	$(COMPILE) $(SOURCE)
 
-ListTest.o: ListTest.c List.h
-	gcc -std=c17 -Wall -c ListTest.c
+$(ADT1_TEST).o: $(ADT1_TEST).c $(ADT1_HEADER) $(ADT2_HEADER)
+	$(COMPILE) $(ADT1_TEST).c
 
-List.o: List.c List.h
-	gcc -std=c17 -Wall -c List.c
+$(ADT2_TEST).o: $(ADT2_TEST).c $(ADT2_HEADER)
+	$(COMPILE) $(ADT2_TEST).c
 
-clean: 
-	rm -r -f MatrixTest *.o *.txt
+$(ADT1_OBJECT): $(ADT1_SOURCE) $(ADT1_HEADER)
+	$(COMPILE) $(ADT1_SOURCE)
 
-checkTest :
-	make MatrixTest
-	valgrind --leak-check=full ./MatrixTest
+$(ADT2_OBJECT): $(ADT2_SOURCE) $(ADT2_HEADER)
+	$(COMPILE) $(ADT2_SOURCE)
+
+clean:
+	$(REMOVE) $(MAIN) $(ADT1_TEST) $(ADT2_TEST)  
+	$(REMOVE) $(OBJECT) $(ADT1_TEST).o $(ADT2_TEST).o $(ADT1_OBJECT) $(ADT2_OBJECT)
+
+$(MAIN)Check: $(MAIN)
+	$(MEMCHECK) $(MAIN) in5 junk5
+
+$(ADT1)Check: $(ADT1_TEST)
+	$(MEMCHECK) $(ADT1_TEST)
+
+$(ADT2)Check: $(ADT2_TEST)
+	$(MEMCHECK) $(ADT2_TEST)
