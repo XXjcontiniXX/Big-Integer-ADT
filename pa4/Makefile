@@ -1,6 +1,12 @@
 # Makefile for pa4
 # jaja
 
+Sparse: Sparse.o Matrix.o List.o
+	gcc -std=c17 -Wall -o Sparse Sparse.o List.o Matrix.o
+
+Sparse.o: Sparse.c Matrix.h
+	gcc -std=c17 -Wall -c Sparse.c
+
 MatrixTest: MatrixTest.o List.o Matrix.o
 	gcc -std=c17 -Wall -o MatrixTest MatrixTest.o List.o Matrix.o
 
