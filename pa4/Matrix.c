@@ -147,7 +147,7 @@ void changeEntry(Matrix M, int i, int j, double x) {
    }
 
 	Entry E = NULL;
-	fprintf(stderr, "movefront on i-1 where i-1 = %d", i-1);
+	fprintf(stderr, "movefront on i-1 where i-1 = %d\n", i-1);
 	moveFront((M->lists)[i-1]);
 	while ( index(M->lists[i-1]) != -1 ) {
 		E = get((M->lists)[i-1]);	     // get Entry at some index of row_i	
