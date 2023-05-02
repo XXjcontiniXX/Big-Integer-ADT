@@ -74,6 +74,7 @@ List newList(){
 // Frees all heap memory associated with List *pL, and sets *pL to NULL.
 void freeList(List* pL){
    if(pL!=NULL && *pL!=NULL) { 
+		printf("freeList was (unncesarily) called somewhere\n");
 		while( length(*pL) > 0) { // while still elements in there
          deleteBack(*pL);
       }
