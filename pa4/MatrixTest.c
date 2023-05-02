@@ -47,23 +47,30 @@ int main(int argc, char* argv[]){
 	changeEntry(P, 1, 2, 3);
 	changeEntry(P, 1, 3, 3);
 	changeEntry(P, 2, 3, 3);
-	printMatrix(stdout, diff(P, P));
-	/*
+	//changeEntry(P, 3, 1, 3);
+   //changeEntry(P, 3, 2, 3);
+   //changeEntry(P, 2, 1, 3);
+
 	Matrix Pl = newMatrix(3);
 	changeEntry(Pl, 3, 1, 3);
    changeEntry(Pl, 3, 2, 3);
    changeEntry(Pl, 2, 1, 3);
-	
+	//changeEntry(Pl, 1, 2, 3);
+   //changeEntry(Pl, 1, 3, 3);
+   //changeEntry(Pl, 2, 3, 3);
+	//modEntry(Pl, 'a', 2, 1, 4);	
+
 	printMatrix(stdout, P);
 	printf("\n");
 	printMatrix(stdout, Pl);
 	printf("\n");
-	Matrix Pm = product(P, Pl);
+	Matrix Pm = diff(P, Pl);
 	printMatrix(stdout, Pm);
+
 	freeMatrix(&P);
-	freeMatrix(&Pm);
 	freeMatrix(&Pl);
-	*/
+	freeMatrix(&Pm);
+	
 	//printMatrix(stdout, transpose(P));
 	//assert(NNZ(M) == 3);
 	//printMatrix(stdout, M);

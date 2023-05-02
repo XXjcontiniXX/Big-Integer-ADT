@@ -40,7 +40,7 @@ Matrix newMatrix(int n) {
 	if (M == NULL) {fprintf(stderr, "Matrix Error: newMatrix allocation failed"); exit(EXIT_FAILURE);}
 	M->lists = (List*)malloc(n*sizeof(List));
 	for (int i = 0; i < n; i += 1) {
-		(M->lists)[i] = NULL;
+		(M->lists)[i] = newList();
 	}
 	M->nze = 0;
 	M->dim = n;
@@ -51,9 +51,7 @@ Matrix newMatrix(int n) {
 // Frees heap memory associated with *pM, sets *pM to NULL.
 void freeMatrix(Matrix* pM) {
 	for (int i = 0; i < (*pM)->dim; i += 1) {
-		if ( ((*pM)->lists)[i] != NULL ) {
-			freeList( &(((*pM)->lists)[i]) );
-		}
+		freeList( &(((*pM)->lists)[i]) );
 	}
 	free((*pM)->lists);
 	free(*pM);
@@ -91,8 +89,6 @@ int entryCmp(Entry A, Entry B) {
 }
 
 int rowCmp(List A, List B) {
-	if (A == NULL && B != NULL) { return 0; }
-	if (A != NULL && B == NULL) { return 0; }
 	moveFront(A);
 	moveFront(B);
 	if (length(A) - length(B) != 0) {
@@ -116,16 +112,13 @@ int equals(Matrix A, Matrix B) {
 	if ( size(A) != size(B)) {
 		return 0;
 	}
-	
    for (int i = 0; i < size(A); i++) {
-		if ((A->lists)[i] == NULL && (B->lists)[i] == NULL) { continue; } 
       if ( !rowCmp( (A->lists)[i], (B->lists[i])) ) {
 			return 0;
 		}
 	}
 	return 1;
 }
-
 // Manipulation procedures
 // makeZero()
 // Re-sets M to the zero Matrix state.
@@ -135,7 +128,6 @@ void makeZero(Matrix M) {
       exit(EXIT_FAILURE);
    }
 	for (int i = 0; i < size(M); i++) {
-		if ((M->lists)[i] == NULL) {continue;}
 		freeList( &((M->lists)[i]) );
 	}
 	M->nze = 0;
@@ -153,14 +145,6 @@ void changeEntry(Matrix M, int i, int j, double x) {
       fprintf(stderr, "Matrix Error: calling changeEntry() with invalid row or column values\n");
       exit(EXIT_FAILURE);
    }
-
-	if ((M->lists)[i-1] == NULL) {
-		if (x == 0) {return;}
-		(M->lists)[i-1] = newList();
-		append((M->lists)[i-1], newEntry(x, i, j));
-		M->nze += 1;
-		return;
-	} // but if its not empty
 
 	Entry E = NULL;	
 	moveFront((M->lists)[i-1]);
@@ -196,7 +180,6 @@ Matrix copy(Matrix A) {
 	Matrix M = newMatrix(size(A));
    Entry E = NULL;
    for (int i = 0; i < size(A); i++) {
-      if ( (A->lists)[i] == NULL ) {continue;}
       moveFront((A->lists)[i]);
       while ( index((A->lists)[i]) != -1 ) {
          E = get((A->lists)[i]);
@@ -214,7 +197,6 @@ Matrix transpose(Matrix A) {
 	Matrix M = newMatrix(size(A));
 	Entry E = NULL;
 	for (int i = 0; i < size(A); i++) {
-      if ( (A->lists)[i] == NULL ) {continue;}
 		moveFront((A->lists)[i]);
 		while ( index((A->lists)[i]) != -1 ) {
 			E = get((A->lists)[i]);
@@ -235,9 +217,8 @@ Matrix scalarMult(double x, Matrix A) {
 	Entry Ea = NULL;
 	Matrix M = newMatrix(size(A));
 	for (int i = 0; i < size(A); i++) {
-		if ( (A->lists)[i] == NULL ) {continue;}
       moveFront((A->lists)[i]);
-      while ( ((A->lists)[i] != NULL) && (index((A->lists)[i]) != -1) ) {
+      while ( (index((A->lists)[i]) != -1) ) {
 			Ea = get((A->lists)[i]);
 			changeEntry(M, Ea->r, Ea->c, Ea->val * x);
          moveNext((M->lists)[i]);
@@ -280,7 +261,7 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
             delete((M->lists)[i-1]);
             M->nze -= 1; // for sure were down a nze cuz there are no zero entries
          }else{
-            E->val = x;
+            E->val = E->val + x;
          }
          return;
 		}
@@ -310,10 +291,6 @@ Matrix sum(Matrix A, Matrix B) {
 	if (A == B) {
 		int sum = 0;
       for (int i = 0; i < size(A); i += 1) {
-			if ((A->lists)[i] == NULL) {
-				continue;
-			}
-		
 			moveFront((A->lists)[i]);
 			while ( index((A->lists)[i]) != -1 ) {
          	Ea = get((A->lists)[i]);
@@ -324,18 +301,8 @@ Matrix sum(Matrix A, Matrix B) {
    	}
 		return M;
 	}
-
+	
    for (int i = 0; i < size(A); i++) {
-		if ( (A->lists)[i] == NULL && (B->lists)[i] == NULL ) {continue;} // if null then do nothin
-		if ((A->lists)[i] == NULL) { // if A null then set M's entry to B's entry // cuz an entry plus 0 equals the entry
-			M->lists[i]	= copyList( (B->lists)[i] );
-			continue;
-		}
-		if ((B->lists)[i] == NULL) { // if B row null set M's entire row to A's row
-         M->lists[i] = copyList( (A->lists)[i] );
-			continue;
-		}
-		
 		moveFront((A->lists)[i]);
 		moveFront((B->lists)[i]);
 		
@@ -375,18 +342,8 @@ Matrix diff(Matrix A, Matrix B) {
    Entry Ea = NULL;
    Entry Eb = NULL;
    Matrix M = newMatrix(size(A));
-
-   for (int i = 0; i < size(A); i++) {
-      if ( (A->lists)[i] == NULL && (B->lists)[i] == NULL ) {continue;} // if null then do nothin
-      if ((A->lists)[i] == NULL) { // if A null then set M's entry to B's entry // cuz an entry plus 0 equals the entry
-         M->lists[i] = copyList( (B->lists)[i] );
-         continue;
-      }
-      if ((B->lists)[i] == NULL) { // if B row null set M's entire row to A's row
-         M->lists[i] = copyList( (A->lists)[i] );
-         continue;
-      }
-
+	
+	for (int i = 0; i < size(A); i++) {
       moveFront((A->lists)[i]);
       moveFront((B->lists)[i]);
 
@@ -395,6 +352,7 @@ Matrix diff(Matrix A, Matrix B) {
          changeEntry(M, Ea->r, Ea->c, Ea->val);
          moveNext((A->lists)[i]);
       }
+
       while ( index((B->lists)[i]) != -1 ) {
          Eb = get((B->lists)[i]);
          modEntry(M, 's', Eb->r, Eb->c, Eb->val); // add entries together
@@ -405,6 +363,7 @@ Matrix diff(Matrix A, Matrix B) {
    return M;
 
 }
+
 // product()
 // Returns a reference to a new Matrix object representing AB
 // pre: size(A)==size(B)
@@ -467,7 +426,7 @@ double vectorDot (List L, List Q) {
 // in that row. The double val will be rounded to 1 decimal point.
 void printMatrix(FILE* out, Matrix M) {
 	for (int i = 0; i < size(M); i++) {
-		if ( (M->lists)[i] == NULL ) {continue;}
+		if ( length((M->lists)[i]) == 0 ) {continue;}
       moveFront((M->lists)[i]);
 		fprintf(out, "%d: ", i + 1);
 		while( index((M->lists)[i]) != -1) {

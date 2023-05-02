@@ -13,6 +13,7 @@ typedef struct MatrixObj* Matrix;
 typedef struct EntryObj* Entry;
 void printEntry(FILE* out, Entry E);
 */
+//void modEntry(Matrix M, char s, int i, int j, double x);
 
 // newMatrix()
 // Returns a reference to a new nXn Matrix object in the zero state.
