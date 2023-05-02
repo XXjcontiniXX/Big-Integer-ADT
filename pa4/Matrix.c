@@ -147,8 +147,9 @@ void changeEntry(Matrix M, int i, int j, double x) {
    }
 
 	Entry E = NULL;
-	fprintf(stderr, "movefront on i-1 where i-1 = %d\n", i-1);
+	fprintf(stdout, "movefront on i-1 where i-1 = %d\n", i-1);
 	moveFront((M->lists)[i-1]);
+	fprintf(stdout, "coupled^^\n");
 	while ( index(M->lists[i-1]) != -1 ) {
 		E = get((M->lists)[i-1]);	     // get Entry at some index of row_i	
 		if ( j < E->c ) { // if j is immeidtaly behind first column # insertBefore
