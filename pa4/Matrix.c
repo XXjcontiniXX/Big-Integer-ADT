@@ -244,7 +244,7 @@ void modEntry(Matrix M, char o, int i, int j, double x) {
 		x = x;	
 	}
 	if (o == 's') {
-		x = x * (-1);
+		x = x * (double)(-1);
 	}
 
    moveFront((M->lists)[i-1]);
@@ -289,12 +289,12 @@ Matrix sum(Matrix A, Matrix B) {
 	Entry Eb = NULL;
    Matrix M = newMatrix(size(A));
 	if (A == B) {
-		int sum = 0;
+		double sum = 0;
       for (int i = 0; i < size(A); i += 1) {
 			moveFront((A->lists)[i]);
 			while ( index((A->lists)[i]) != -1 ) {
          	Ea = get((A->lists)[i]);
-				sum = (Ea->val)*2;
+				sum = (Ea->val)* (double)(2);
 				changeEntry(M, Ea->r, Ea->c, sum);
 				moveNext((A->lists)[i]);
       	}
@@ -379,7 +379,7 @@ Matrix product(Matrix A, Matrix B) {
 
 	Matrix Bt = transpose(B);
 	Matrix prod = newMatrix(size(A));
-	int  vdot;
+	double vdot;
 	for (int i = 0; i < size(A); i += 1) {
 		for (int j = 0; j < size(Bt); j += 1) {
 			vdot = vectorDot((A->lists)[i], (Bt->lists)[j]);
@@ -440,7 +440,7 @@ void printMatrix(FILE* out, Matrix M) {
 
 
 void printEntry(FILE* out, Entry E) {
-	fprintf(out, "(%d, %lf) ", E->c, E->val);
+	fprintf(out, "(%d, %.1lf) ", E->c, E->val);
 }
 
 
