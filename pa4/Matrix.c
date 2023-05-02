@@ -128,7 +128,7 @@ void makeZero(Matrix M) {
       exit(EXIT_FAILURE);
    }
 	for (int i = 0; i < size(M); i++) {
-		freeList( &((M->lists)[i]) );
+		clear( ((M->lists)[i]) );
 	}
 	M->nze = 0;
 }
