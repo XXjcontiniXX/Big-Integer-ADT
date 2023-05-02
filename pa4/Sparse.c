@@ -66,6 +66,16 @@ int main(int argc, char* argv[]){
 			changeEntry(B, row, col, val);
 		}
 	}
+	Matrix C, D, E, F, G, H, I, J;
+	C = scalarMult(1.5, A);
+	D = sum(A, B);
+	E = sum(A, A);
+	F = diff(B, A);
+	G = diff(A,A);
+	H = transpose(A);
+	I = product(A, B);
+	J = product(B, B);
+	
 	fprintf(out, "A has %d non-zero entries:\n", loop1);
 	printMatrix(out, A);
 	fprintf(out, "\n");
@@ -75,38 +85,47 @@ int main(int argc, char* argv[]){
 	fprintf(out, "\n");
 
 	fprintf(out, "(1.5)*A =\n");
-	printMatrix(out, scalarMult(1.5, A));
+	printMatrix(out, C);
 	fprintf(out, "\n");
 
 	fprintf(out, "A+B =\n");
-	printMatrix(out, sum(A,B));
+	printMatrix(out, D);
 	fprintf(out, "\n");
 
    fprintf(out, "A+A =\n");
-	printMatrix(out, sum(A, A));
+	printMatrix(out, E);
 	fprintf(out, "\n");
 
    fprintf(out, "B-A =\n");
-	printMatrix(out, diff(B, A));
+	printMatrix(out, F);
 	fprintf(out, "\n");
 
 	fprintf(out, "A-A =\n");
-	printMatrix(out, diff(A,A));
+	printMatrix(out, G);
 	fprintf(out, "\n");
 
    fprintf(out, "Transpose(A) =\n");
-	printMatrix(out, transpose(A));
+	printMatrix(out, H);
 	fprintf(out, "\n");
 
    fprintf(out, "A*B =\n");
-	printMatrix(out, product(A, B));
+	printMatrix(out, I);
 	fprintf(out, "\n");
 
 	fprintf(out, "B*B =\n");
-	printMatrix(out, product(B, B));
+	printMatrix(out, J);
 	fprintf(out, "\n");
 	
 	freeMatrix(&A);
 	freeMatrix(&B);
+	freeMatrix(&C);
+	freeMatrix(&D);
+	freeMatrix(&E);
+	freeMatrix(&F);
+	freeMatrix(&G);
+	freeMatrix(&H);
+	freeMatrix(&I);
+	freeMatrix(&J);
+	A = NULL;
 	return 0;      
 }
