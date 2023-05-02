@@ -1,4 +1,6 @@
 # Makefile for pa4
+# jcontini
+# James Contini
 # jaja
 
 Sparse: Sparse.o Matrix.o List.o
@@ -26,7 +28,7 @@ List.o: List.c List.h
 	gcc -std=c17 -Wall -c List.c
 
 clean: 
-	rm -r -f *.o 
+	rm -r -f *.o *.txt
 
 checkTest :
 	make MatrixTest
