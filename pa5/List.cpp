@@ -61,8 +61,7 @@ int List::length() const{ // ohhh the reason for const is that this is an "acces
 // pre: length()>0
 ListElement List::front() const{
 	if (length() <= 0) {
-		fprintf(stderr, "List Error: Calling front() on an empty list.");
-		exit(1);
+		throw std::length_error("List Error: Calling front() on an empty list.");
 	}
 
 	return(frontDummy->next->data);
@@ -73,8 +72,7 @@ ListElement List::front() const{
 // pre: length()>0
 ListElement List::back() const{
 	if (length() <= 0) {
-      fprintf(stderr, "List Error: Calling back() on an empty list.");
-      exit(1);
+      throw std::length_error("List Error: Calling back() on an empty list.");
    }
 	return(backDummy->prev->data);
 }
@@ -83,12 +81,10 @@ ListElement List::back() const{
 // Returns the position of cursor in this List: 0 <= position() <= length().
 int List::position() const { // in this context, "this" is the same thing
 	if (length() < 0) {
-      fprintf(stderr, "List Error: Calling position() on an empty list.");
-      exit(1);
+      throw std::length_error("List Error: Calling position() on an empty list.");
    }
 	if (pos_cursor < 0) {
-      fprintf(stderr, "List Error: Calling position() with when position is less than 0");
-      exit(1);
+      throw std::length_error("List Error: Calling position() with when position is less than 0");
    }
 	return pos_cursor;
 	
@@ -99,8 +95,7 @@ int List::position() const { // in this context, "this" is the same thing
 // pre: position()<length()
 ListElement List::peekNext() const {
 	if ( position() >= length() ) { // if we try to peekNext when pos is on last element
-      fprintf(stderr, "List Error: Calling peekNext() at the end of the list.");
-      exit(1);
+      throw std::length_error("List Error: Calling peekNext() at the end of the list.");
    }
 	return afterCursor->data;
 
@@ -111,8 +106,7 @@ ListElement List::peekNext() const {
 // pre: position()>0
 ListElement List::peekPrev() const {
 	if ( position() <= 0 ) { // if we try to peekPrev when pos is on first element
-      fprintf(stderr, "List Error: Calling peekPrev() at the beginning of the list.");
-      exit(1);
+      throw std::length_error("List Error: Calling peekPrev() at the beginning of the list.");
  	}
 	return beforeCursor->data;
 }
@@ -151,8 +145,7 @@ void List::moveBack() {
 // pre: position()<length()
 ListElement List::moveNext() {
 	if ( position() >= length() ) {
-      fprintf(stderr, "List Error: Calling moveNext() at the end of the list.");
-      exit(1);
+     throw std::length_error("List Error: Calling moveNext() at the end of the list.");
    }
 
 	Node* newBefore = afterCursor;
@@ -171,8 +164,7 @@ ListElement List::moveNext() {
 // pre: position()>0
 ListElement List::movePrev() {
 	if ( position() <= 0 ) { // if we try to peekPrev when pos is on first element
-      fprintf(stderr, "List Error: Calling movePrev() at the beginning of the list.");
-      exit(1);
+      throw std::length_error("List Error: Calling movePrev() at the beginning of the list.");
    }
 	Node* newBefore = beforeCursor->prev;
 	Node* newAfter = beforeCursor;
