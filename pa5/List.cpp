@@ -82,7 +82,7 @@ ListElement List::back() const{
 // position()
 // Returns the position of cursor in this List: 0 <= position() <= length().
 int List::position() const { // in this context, "this" is the same thing
-	if (length() <= 0) {
+	if (length() < 0) {
       fprintf(stderr, "List Error: Calling position() on an empty list.");
       exit(1);
    }
