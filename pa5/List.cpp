@@ -380,12 +380,27 @@ List List::concat(const List& L) const {
 	newList.moveFront();
 	return newList; // returntd::cout << new list
 }
-/*
+
 // to_string()
 // Returns a string representation of this List consisting of a comma
 // separated sequence of elements, surrounded by parentheses.
-std::string to_string() const;
-*/
+std::string List::to_string() const {
+	List::Node* N = (this->frontDummy)->next;
+   std::string s = "(";
+	
+   while (N != this->backDummy) {
+      s += std::to_string(N->data);
+      N = N->next;
+		if (N != this->backDummy) {
+			s += ", ";
+		}else{
+			s+= ")";
+		}
+   }
+   return s;
+
+}
+
 // equals()
 // Returns true if and only if this List is the same integer sequence as R.
 // The cursors in this List and in R are unchanged.

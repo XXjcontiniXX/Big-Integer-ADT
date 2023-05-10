@@ -134,6 +134,9 @@ int main(){
 	cout << (C); 
 
 	cout << (int)(A->equals(*B));
+	cout << "\nto_string function\n";
+
+	cout << C.to_string();
 
 	delete A;
 	delete B;
