@@ -8,7 +8,7 @@
 using namespace std;
 
 
-
+void shuffle(List& D);
 
 int main(){ 
 	List* A = new List();
@@ -135,11 +135,54 @@ int main(){
 
 	cout << (int)(A->equals(*B));
 	cout << "\nto_string function\n";
-
 	cout << C.to_string();
+
+	cout << "\n\n\nTesting shuffle now\n\n\n";
+	A->clear();
+	A->moveFront();
+	
+	A->insertAfter(0);
+   A->moveNext();
+	A->insertAfter(1);
+   A->moveNext();
+   A->insertAfter(2);
+   A->moveNext();
+   A->insertAfter(3);	
+	A->moveNext();
+   A->insertAfter(4);
+   A->moveNext();
+   A->insertAfter(5);
+	A->moveNext();
+   A->insertAfter(6);		
+	A->moveNext();
+   A->insertAfter(7);	
+
+	cout << A->to_string();
+
+	shuffle(*A);
+	cout << "\n\n";	
+	cout << A->to_string();
+	cout << "\n";
 
 	delete A;
 	delete B;
 	
 	return 0;
+}
+
+
+void shuffle(List& D) {
+   int size = D.length();
+   ListElement key;
+   for (int i = 0; i < size/2; i += 1) {
+		D.moveFront();
+      key = D.moveNext();
+      D.eraseBefore();
+      while (D.position() < size/2 + i) { // so position() will have hit the size/2 when loop is over
+         D.moveNext();
+         if (D.position() == size/2 + i) {
+            D.insertBefore(key);
+         }
+      }
+   }
 }
