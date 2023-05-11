@@ -1,12 +1,12 @@
 James Contini / jcontini / pa5
-## USAGE: `./Shuffle <deck size>
+## USAGE: `./Shuffle <deck size>`
 
 ### List.h
- List.h is a C header which prototypes all of List.c's public functions and types for the List ADT.
+ List.h is a C++ header which prototypes all of List.cpp's public functions and types for the List ADT.
 ### List.cpp
- List.c is a C source file which contains the public and private List ADT functions.
+ List.c is a C++ source file which contains the public and private List ADT functions.
 ### ListTest.cpp
- ListTest.c is a C file which contains the test cases for the List ADT.
+ ListTest.c is a C++ file which contains the test cases for the List ADT.
 ### Shuffle.cpp
  Shuffle.cpp is the main program file. Shuffle.cpp handles all FileIO and uses the List ADT's client functions to demonstrate the riffle shuffle function.
 ### README.md
