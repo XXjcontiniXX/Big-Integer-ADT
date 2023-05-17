@@ -79,7 +79,7 @@ BigInteger::BigInteger(const BigInteger& N) {
 	this->signum = N.signum;
 	return;
 }
-/*
+
    // Optional Destuctor
    // ~BigInteger()
    // ~BigInteger();
@@ -87,17 +87,50 @@ BigInteger::BigInteger(const BigInteger& N) {
 
    // Access functions --------------------------------------------------------
 
-   // sign()
-   // Returns -1, 1 or 0 according to whether this BigInteger is positive, 
-   // negative or 0, respectively.
-   int sign() const;
+// sign()
+// Returns -1, 1 or 0 according to whether this BigInteger is positive, 
+// negative or 0, respectively.
+int BigInteger::sign() const {
+	return signum;
+}
 
-   // compare()
-   // Returns -1, 1 or 0 according to whether this BigInteger is less than N,
-   // greater than N or equal to N, respectively.
-   int compare(const BigInteger& N) const;
+// compare()
+// Returns -1, 1 or 0 according to whether this BigInteger is less than N,
+// greater than N or equal to N, respectively.
+int BigInteger::compare(const BigInteger& N) const { // they genuinely want me to make a copy wow
+	if ( (this->digits).length() < (N.digits).length() ) { // big
+		return -1;
+	}
+
+	if ( (this->digits).length() > (N.digits).length() ) {
+		return 1;
+	}
+	
+	List thussy = List(this->digits);
+	List nussy = List(N.digits);
+
+	
+	thussy.moveFront();
+	nussy.moveFront();
+	
+	ListElement haec;
+	ListElement en;
+	
+	while ( thussy.position() != thussy.length() ) { // while we not at the end
+		haec = thussy.moveNext();
+		en = nussy.moveNext();
+		if (haec == en) {
+			continue;
+		}
+
+		return haec > en ? 1 : -1;
+	}
+	
+	return 0;
+}
 
 
+/*
    // Manipulation procedures -------------------------------------------------
 
    // makeZero()
