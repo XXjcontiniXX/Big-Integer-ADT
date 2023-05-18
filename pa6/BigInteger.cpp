@@ -203,45 +203,47 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 	
 	
 	BigInteger sum = BigInteger();
-	
+	if (this->sign() == 0 && N.sign() == 0 ) {
+      return sum;
+   }	
+
+
 	List &C = sum.digits;
 	C.moveBack();
-	
-	long maxDigit = 1;
 
+
+	long radix = 1;
 	for (int i = 0; i < power; i += 1){
-            maxDigit = maxDigit * 10;
+            radix = radix * 10;
    }
-	long radix = maxDigit;
-	maxDigit = maxDigit - 1;
-
-
+	
+	
 	ListElement place = 0;
-	ListElement top_num = 0;
-	ListElement bottom_num = 0;	
+   ListElement top_num = 0;
+   ListElement bottom_num = 0;
 
 	bool carry = false;
-	
-	while (top.position() > 0 && bottom.position() > 0) {
-		top_num = top.movePrev();
-		bottom_num = bottom.movePrev();
-		top_num  = carry ? top_num + 1 : top_num; // if carry top_num gets another number
-		place = top_num + bottom_num; // 
 
-		//top_max = maxDigit - bottom_num // 5 = 9 - 4 in other words: if the bottom is 4, the top must be less than 6 or we must arry
+   while (top.position() > 0 && bottom.position() > 0) {
+		sum.signum = 1;
+		top_num = top.movePrev();
+      bottom_num = bottom.movePrev();
 		
-		if (place > maxDigit) { // if place is bigger than a digit
-			place = place % radix; // reduce it to the radix
+		place = carry ? top_num + bottom_num + 1: top_num + bottom_num; // carry if carry == 1
+		
+		if ( place >= radix) {
+			carry = true;
+			place = place - radix; // normalize
 			C.insertBefore(place); // place it
-			C.movePrev();
-			carry = true; // turn carry on
-		}else{ // if we dont need to carry
-			place = top_num + bottom_num;
-			C.insertBefore(place);
-			C.movePrev();
+         C.movePrev();
+		}else{
 			carry = false;
-		}	
+			C.insertBefore(place); // place it
+         C.movePrev();
+		}
+	
 	}
+	
 		
 	if (bottom.position() == 0 && top.position() == 0) {
 		if (carry) {
@@ -254,148 +256,156 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 		
 	while (top.position() > 0) {
 		top_num = top.movePrev();
-		if (carry) {
-			top_num = top_num + 1;
-		}
+		place = carry ? top_num + 1 : top_num;
 		
-		if (top_num > maxDigit) {
-			top_num = top_num % radix;
+		if (place >= radix) {
 			carry = true;
+			place = place - radix; // normalize
+			C.insertBefore(place); // place it
+         C.movePrev();
 		}else{
-			carry = false;
+			carry = false; // we dont need to borrow anymore
+			C.insertBefore(place); // no need to normalize
+      	C.movePrev();
 		}
-		C.insertBefore(top_num);      
-		C.movePrev();
 	}
 
 	
 	while (bottom.position() > 0) {
       bottom_num = bottom.movePrev();
-      if (carry) {
-         bottom_num = bottom_num + 1;
-      }
+      place = carry ? bottom_num + 1 : bottom_num;
 
-      if (bottom_num > maxDigit) {
-         bottom_num = bottom_num % radix;
+      if (place >= radix) {
          carry = true;
+         place = place - radix; // normalize
+         C.insertBefore(place); // place it
+         C.movePrev();
       }else{
-         carry = false;
+         carry = false; // we dont need to borrow anymore
+         C.insertBefore(place); // no need to normalize
+         C.movePrev();
       }
-      C.insertBefore(bottom_num);
-      C.movePrev();
    }
 	return sum;
-
 }
 
 
 // sub()
 // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const {
-	List top = List(this->digits);
-   List bottom = List(N.digits);
 
+	bool reverse = false;
+	BigInteger top_int = BigInteger(*this);
+	BigInteger bottom_int = BigInteger(N);
+	BigInteger diff = BigInteger();
+	BigInteger tmp;
+	if (this->sign() == 0 && N.sign() == 0 ) {
+      return diff;
+   }
+		
+
+	if(this->sign() == -1 && N.sign() == -1) { // if top and bottom negative, the top is the antagoniser, the negative.
+      tmp = BigInteger(top_int);
+      top_int = bottom_int;
+      bottom_int = tmp;
+      if ( top_int.compare(bottom_int) == 1) { // but if the bottom is smaller we gave to flip it around again and then reverse the sign
+			tmp = BigInteger(top_int);
+			top_int = bottom_int;
+			bottom_int = tmp;
+			reverse = true;
+		} // if the bottom is greater were fine
+   }else if (this->sign() == 1 && N.sign() == -1) {
+		bottom_int.negate();
+		diff = top_int.add(bottom_int);
+		return diff;
+	}else if (this->sign() == -1 && N.sign() == 1) {
+		top_int.negate();
+		diff = top_int.add(bottom_int);
+		diff.negate();
+		return diff;
+	}else{ // (this->sign() == 1 && N.sign() == 1) // if normal we gotta compare bottom n top
+		if ( top_int.compare(bottom_int) == -1) { // but if the bottom is smaller we gave to flip it around again and then reverse the sign
+         tmp = BigInteger(top_int);
+         top_int = bottom_int;
+         bottom_int = tmp;
+         reverse = true;
+      }	
+	}
+	
+	List top = List(top_int.digits);
+   List bottom = List(bottom_int.digits);
+	
    top.moveBack();
    bottom.moveBack();
 
-
-   BigInteger diff = BigInteger();
-
    List &C = diff.digits;
    C.moveBack();
-
-   long maxDigit = 1;
-
+	
+	long radix = 1;
    for (int i = 0; i < power; i += 1){
-            maxDigit = maxDigit * 10;
+            radix = radix * 10;
    }
-	long radix = maxDigit;
-   maxDigit = maxDigit - 1;
-	
-	
 
    ListElement place = 0;
    ListElement top_num = 0;
    ListElement bottom_num = 0;
-
 	
-	int sp = 0;
+	bool borrow = false;
 	
-   while (top.position() > 0 && bottom.position() > 0) {
+	while (top.position() > 0 && bottom.position() > 0) {
+		diff.signum = 1;
       top_num = top.movePrev();
       bottom_num = bottom.movePrev();
-		
-		if (top_num < bottom_num) { // if we need to borrow
-			// borrow can't be true (i think) beneath bc 
-			if (top.peekPrev() == 0) { // if the number behind is 0 (so we cant borrow)
-				sp = top.position(); // remember what position needs to borrow
-				
-				while(top.movePrev() == 0){ // move backwards until we find a number we can borrow from
-					if(top.peekPrev() > 0){  // check after each move if the one behind is not 0 
-						break; // once found leave loop
-					}
-				}
-				top.setBefore( (top.peekPrev()) - 1); // decrement that one
-				
-				while(top.position() != sp) { // coming back to stack pointer
-					top.moveNext();
-					top.setBefore(radix - 1); // setting them to radix-1 like 9 or 99 or 999 because they were zero and r brwed from now
-				}
-				top_num = top_num + radix; // now were where we were at the beginning 
-				place = top_num - bottom_num;
-				C.insertBefore(place);
-         	C.movePrev();	
-				continue;
-			}else{
-				top.setBefore(top.peekPrev() - 1);
-				top_num = top_num + radix;
-				place = top_num - bottom_num;
-            C.insertBefore(place);
-            C.movePrev();
-				continue;
-			}
-		}else{
-			place = top_num - bottom_num;
-			C.insertBefore(place);
-			C.movePrev();
-		}
+
+      place = borrow ? top_num - bottom_num - 1: top_num - bottom_num; // carry if carry == 1
+
+      if (place < 0) {
+         borrow = true;
+         place = place + radix; // normalize
+         C.insertBefore(place); // place it
+         C.movePrev();
+      }else{
+         borrow = false;
+         C.insertBefore(place); // place it
+         C.movePrev();
+      }
+
+   }
+
+	while (top.position() > 0) {
+      top_num = top.movePrev();
+      place = borrow ? top_num - 1 : top_num;
+
+      if (place < 0) {
+         borrow = true;
+         place = place + radix; // normalize
+         C.insertBefore(place); // place it
+         C.movePrev();
+      }else{
+         borrow = false; // we dont need to borrow anymore
+         C.insertBefore(place); // no need to normalize
+         C.movePrev();
+      }
+   }
+
+	long check = 0;
+   (diff.digits).moveBack();
+   while (check == 0 && (diff.digits).position() > 0) {
+      check += (diff.digits).movePrev();
+   }
+
+   if (check == 0) {
+      (diff.digits).clear();
+      diff.signum = 0;
+   }
+
+
+	if (reverse) {
+		diff.signum = -1;
+		return diff;
+	}else{
+		return diff;	
 	}
-
-	/*
-   while (top.position() > 0) {
-      top_num = top.movePrev();
-      if (carry) {
-         top_num = top_num + 1;
-      }
-
-      if (top_num > maxDigit) {
-         top_num = top_num % (maxDigit + 1);
-         carry = true;
-      }else{
-         carry = false;
-      }
-      C.insertBefore(top_num);
-      C.movePrev();
-   }
-	
-	while (bottom.position() > 0) {
-      bottom_num = bottom.movePrev();
-      if (carry) {
-         bottom_num = bottom_num + 1;
-      }
-
-      if (bottom_num > maxDigit) {
-         bottom_num = bottom_num % (maxDigit + 1);
-         carry = true;
-      }else{
-         carry = false;
-      }
-      C.insertBefore(bottom_num);
-      C.movePrev();
-   }
-	*/
-   return diff;
-	
 }
 /*
    // mult()
@@ -418,6 +428,9 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
    // operator<<()
    // Inserts string representation of N into stream.
    std::ostream& operator<<( std::ostream& stream, BigInteger N ) {
+		if (N.signum != 0){
+			stream << (N.signum == 1 ? '+' : '-') << " ";
+		}
 		stream << N.digits;
 		return stream;
 	}
@@ -465,5 +478,4 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
    // operator*=()
    // Overwrites A with the product A*B. 
    friend BigInteger operator*=( BigInteger& A, const BigInteger& B );
-
 */

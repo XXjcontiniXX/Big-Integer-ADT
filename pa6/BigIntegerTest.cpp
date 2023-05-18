@@ -20,12 +20,32 @@ int main () {
 	cout << zero.sign() << endl;
 	cout << zeroer.sign() << endl;
 	assert(zero.compare(zeroer) == -1);
+
+	// add tests //
+	cout << "\n\n\nBeginning add tests:\n";
+	BigInteger two = BigInteger("9999999999"); 
+	BigInteger one = BigInteger("1000000000000090000000000000");
+	cout << one;
+	cout << '+' << '\n';
+	cout << two;
+	cout << "Addition: " << one.add(two) << "\n";
+
+	cout << "\n\n\nBeginning subtract tests:\n";
+	
+	BigInteger four = BigInteger("1111111111111111111");
+	BigInteger three = BigInteger("111111111");	
+
+	
+	cout << three;
+	cout << '-' << '\n';
+	cout << four;
+	cout << "Subtraction: " << three.sub(four) << "\n";
 	
 	//assert(smaller.sign() == 1);
 	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
 	
 	
-	cout << 	N;
+	//cout << 	N;
 	//BigInteger P = BigInteger(N);
 	
 	//cout << P;
