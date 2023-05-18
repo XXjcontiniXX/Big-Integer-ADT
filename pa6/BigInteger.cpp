@@ -38,10 +38,11 @@ BigInteger::BigInteger(long x) {
 // Pre: s is a non-empty string consisting of (at least one) base 10 digit
 // {0,1,2,3,4,5,6,7,8,9}, and an optional sign {+,-} prefix.
 BigInteger::BigInteger(std::string s) {
-	
+	bool non_zero = false;
 	digits.moveFront();
 	ListElement tmp = 0;
 	ListElement element = 0;
+	signum = 0;
 	for (int i = s.size()-1, j = 0; i >= 0; i -= 1, j += 1) { // could be an incorrect for loop
 		if ( isdigit(s[i]) ) {
 			tmp = s[i] - 48;
@@ -49,29 +50,45 @@ BigInteger::BigInteger(std::string s) {
 				tmp = tmp * 10;
 			}
 			element += tmp;
-			
 			if ( j % power == power - 1) {
+				if (non_zero == false && element == 0){
+					continue;
+				}
+				if (element != 0) {
+					non_zero = true;
+				}
 				digits.insertBefore(element);
 				digits.movePrev();
 				element = 0;
 			}
 	
-		}else if (i == 0){
-	
-			if (s[i] == '-') {
-				signum = -1;
-			}else if (s[i] == '+') {
-				signum = 1;
-			}
 		}else{
-			throw std::invalid_argument("BigInteger: Constructor: non-numeric string\n");
+			if (s[i] == '-' && i == 0) {
+				signum = -1;
+			}else if (s[i] == '+' && i == 0) {
+				signum = 1;
+			}else{
+				throw std::invalid_argument("BigInteger: Constructor: non-numeric string\n");
+			}
 		}
 	}
-	if (element > 0) {
+	if (element > 0 && digits.length() == 0) {
+		if (signum != -1) {
+			signum = 1;
+		}
 		digits.insertBefore(element);
 	}
+	
+	if (element > 0 && non_zero == true) {
+		digits.insertBefore(element);
+	}
+	if (signum != -1 && non_zero == true) {
+		signum = 1;
+	}
+	if (digits.length() == 0) {
+		signum = 0;	
+	}
 }
-
 // BigInteger()
 // Constructor that creates a copy of N.
 BigInteger::BigInteger(const BigInteger& N) {
@@ -98,31 +115,64 @@ int BigInteger::sign() const {
 // Returns -1, 1 or 0 according to whether this BigInteger is less than N,
 // greater than N or equal to N, respectively.
 int BigInteger::compare(const BigInteger& N) const { // they genuinely want me to make a copy wow
-	if ( (this->digits).length() < (N.digits).length() ) { // big
-		return -1;
-	}
-
-	if ( (this->digits).length() > (N.digits).length() ) {
+	if ((*this).sign() == 0 && N.sign() == 0) {
+		return 0;
+	}	
+	
+	if ((*this).sign() > N.sign() ) {
 		return 1;
 	}
 	
-	List thussy = List(this->digits);
-	List nussy = List(N.digits);
+	if (N.sign() > (*this).sign()) {
+		return -1;
+	}
 
+	if ( (this->digits).length() < (N.digits).length()) {
+		if (this->sign() == -1 && N.sign() == -1) {
+			return 1;
+		}      
+		return -1;
+   }
+
+   if ( (this->digits).length() > (N.digits).length() ) {
+      if (this->sign() == -1 && N.sign() == -1) {
+         return -1;
+      }
+		return 1;
+   }
 	
-	thussy.moveFront();
-	nussy.moveFront();
+	List thussy = List(this->digits);
+   List nussy = List(N.digits);
+
+
+   thussy.moveFront();
+   nussy.moveFront();
+
+   ListElement haec;
+   ListElement en;
+
+
+	if (N.sign() == -1 && (*this).sign() == -1) {
+		while ( thussy.position() != thussy.length() ) { // while we not at the end
+      	haec = thussy.moveNext();
+      	en = nussy.moveNext();
+      	if (haec == en) {
+         	continue;
+      	}
+      	return haec > en ? -1 : 1;
+   	}
+
+   	return 0;
 	
-	ListElement haec;
-	ListElement en;
-	
+	}
+
 	while ( thussy.position() != thussy.length() ) { // while we not at the end
 		haec = thussy.moveNext();
 		en = nussy.moveNext();
 		if (haec == en) {
 			continue;
 		}
-
+	
 		return haec > en ? 1 : -1;
 	}
 	
@@ -131,16 +181,18 @@ int BigInteger::compare(const BigInteger& N) const { // they genuinely want me t
 
 
 /*
-   // Manipulation procedures -------------------------------------------------
+// Manipulation procedures -------------------------------------------------
 
-   // makeZero()
-   // Re-sets this BigInteger to the zero state.
-   void makeZero();
+// makeZero()
+// Re-sets this BigInteger to the zero state.
+void makeZero() {
 
-   // negate()
-   // If this BigInteger is zero, does nothing, otherwise reverses the sign of 
-   // this BigInteger positive <--> negative. 
-   void negate();
+}
+
+// negate()
+// If this BigInteger is zero, does nothing, otherwise reverses the sign of 
+// this BigInteger positive <--> negative. 
+void negate();
 
 
    // BigInteger Arithmetic operations ----------------------------------------

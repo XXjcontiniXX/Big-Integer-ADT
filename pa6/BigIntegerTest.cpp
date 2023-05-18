@@ -11,10 +11,18 @@ int main () {
 	BigInteger B = BigInteger("11122222222333333333444444444555555555666666666");	
 	assert(!N.compare(B));
 	
-	BigInteger bigger = BigInteger("11122222222333333333444444444555555555666666662");
+	BigInteger bigger = BigInteger("-11122222222333333333444444444555555555666666662");
 	BigInteger smaller = BigInteger("11122222222333333333444444444555555555666666661");
+	cout << "\n\n"	;
+	BigInteger zero = BigInteger("-00001");
+	BigInteger zeroer = BigInteger("-0000000000000000000000");
+	//cout << zero << " above me is like 11 ones \n";
+	cout << zero.sign() << endl;
+	cout << zeroer.sign() << endl;
+	assert(zero.compare(zeroer) == -1);
 	
-	cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
+	//assert(smaller.sign() == 1);
+	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
 	
 	
 	cout << 	N;
