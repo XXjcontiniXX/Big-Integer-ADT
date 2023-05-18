@@ -38,12 +38,12 @@ BigInteger::BigInteger(long x) {
 // Pre: s is a non-empty string consisting of (at least one) base 10 digit
 // {0,1,2,3,4,5,6,7,8,9}, and an optional sign {+,-} prefix.
 BigInteger::BigInteger(std::string s) {
-	bool non_zero = false;
+	
 	digits.moveFront();
 	ListElement tmp = 0;
 	ListElement element = 0;
-	signum = 0;
-	for (int i = s.size()-1, j = 0; i >= 0; i -= 1, j += 1) { // could be an incorrect for loop
+	signum = 1;
+	for (int i = s.size()-1, j = 0; i >= 0; i -= 1, j += 1) { // starting at back
 		if ( isdigit(s[i]) ) {
 			tmp = s[i] - 48;
 			for (int k = 0; k < j % power; k += 1){
@@ -51,43 +51,35 @@ BigInteger::BigInteger(std::string s) {
 			}
 			element += tmp;
 			if ( j % power == power - 1) {
-				if (non_zero == false && element == 0){
-					continue;
-				}
-				if (element != 0) {
-					non_zero = true;
-				}
 				digits.insertBefore(element);
 				digits.movePrev();
 				element = 0;
 			}
 	
 		}else{
-			if (s[i] == '-' && i == 0) {
-				signum = -1;
-			}else if (s[i] == '+' && i == 0) {
-				signum = 1;
+			if ((s[i] == '-' || s[i] == '+') && (i == 0)) { // the signum is taken care of here
+				signum = (s[i] == '-') ? -1 : 1;
+				break;
 			}else{
 				throw std::invalid_argument("BigInteger: Constructor: non-numeric string\n");
 			}
 		}
 	}
-	if (element > 0 && digits.length() == 0) {
-		if (signum != -1) {
-			signum = 1;
-		}
+	
+	if (element > 0) {
 		digits.insertBefore(element);
+	}
+	long check = 0;
+	digits.moveBack();
+	while (check == 0 && digits.position() > 0) {
+		check += digits.movePrev();
 	}
 	
-	if (element > 0 && non_zero == true) {
-		digits.insertBefore(element);
+	if (check == 0) {
+		digits.clear();
+		signum = 0;
 	}
-	if (signum != -1 && non_zero == true) {
-		signum = 1;
-	}
-	if (digits.length() == 0) {
-		signum = 0;	
-	}
+
 }
 // BigInteger()
 // Constructor that creates a copy of N.
@@ -180,31 +172,232 @@ int BigInteger::compare(const BigInteger& N) const { // they genuinely want me t
 }
 
 
-/*
+
 // Manipulation procedures -------------------------------------------------
 
 // makeZero()
 // Re-sets this BigInteger to the zero state.
-void makeZero() {
-
+void BigInteger::makeZero() {
+	(this->digits).clear();
+	signum = 0;
 }
 
 // negate()
 // If this BigInteger is zero, does nothing, otherwise reverses the sign of 
 // this BigInteger positive <--> negative. 
-void negate();
+void BigInteger::negate() {
+	signum = signum * -1;
+}
 
 
-   // BigInteger Arithmetic operations ----------------------------------------
+// BigInteger Arithmetic operations ----------------------------------------
 
-   // add()
-   // Returns a BigInteger representing the sum of this and N.
-   BigInteger add(const BigInteger& N) const;
+// add()
+// Returns a BigInteger representing the sum of this and N.
+BigInteger BigInteger::add(const BigInteger& N) const {
+	List top = List(this->digits);
+	List bottom = List(N.digits);
+	
+	top.moveBack();
+	bottom.moveBack();	
+	
+	
+	BigInteger sum = BigInteger();
+	
+	List &C = sum.digits;
+	C.moveBack();
+	
+	long maxDigit = 1;
 
-   // sub()
-   // Returns a BigInteger representing the difference of this and N.
-   BigInteger sub(const BigInteger& N) const;
+	for (int i = 0; i < power; i += 1){
+            maxDigit = maxDigit * 10;
+   }
+	long radix = maxDigit;
+	maxDigit = maxDigit - 1;
 
+
+	ListElement place = 0;
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;	
+
+	bool carry = false;
+	
+	while (top.position() > 0 && bottom.position() > 0) {
+		top_num = top.movePrev();
+		bottom_num = bottom.movePrev();
+		top_num  = carry ? top_num + 1 : top_num; // if carry top_num gets another number
+		place = top_num + bottom_num; // 
+
+		//top_max = maxDigit - bottom_num // 5 = 9 - 4 in other words: if the bottom is 4, the top must be less than 6 or we must arry
+		
+		if (place > maxDigit) { // if place is bigger than a digit
+			place = place % radix; // reduce it to the radix
+			C.insertBefore(place); // place it
+			C.movePrev();
+			carry = true; // turn carry on
+		}else{ // if we dont need to carry
+			place = top_num + bottom_num;
+			C.insertBefore(place);
+			C.movePrev();
+			carry = false;
+		}	
+	}
+		
+	if (bottom.position() == 0 && top.position() == 0) {
+		if (carry) {
+			C.insertBefore(long(1));
+      	C.movePrev();
+		}
+		return sum;	
+	}
+	
+		
+	while (top.position() > 0) {
+		top_num = top.movePrev();
+		if (carry) {
+			top_num = top_num + 1;
+		}
+		
+		if (top_num > maxDigit) {
+			top_num = top_num % radix;
+			carry = true;
+		}else{
+			carry = false;
+		}
+		C.insertBefore(top_num);      
+		C.movePrev();
+	}
+
+	
+	while (bottom.position() > 0) {
+      bottom_num = bottom.movePrev();
+      if (carry) {
+         bottom_num = bottom_num + 1;
+      }
+
+      if (bottom_num > maxDigit) {
+         bottom_num = bottom_num % radix;
+         carry = true;
+      }else{
+         carry = false;
+      }
+      C.insertBefore(bottom_num);
+      C.movePrev();
+   }
+	return sum;
+
+}
+
+
+// sub()
+// Returns a BigInteger representing the difference of this and N.
+BigInteger BigInteger::sub(const BigInteger& N) const {
+	List top = List(this->digits);
+   List bottom = List(N.digits);
+
+   top.moveBack();
+   bottom.moveBack();
+
+
+   BigInteger diff = BigInteger();
+
+   List &C = diff.digits;
+   C.moveBack();
+
+   long maxDigit = 1;
+
+   for (int i = 0; i < power; i += 1){
+            maxDigit = maxDigit * 10;
+   }
+	long radix = maxDigit;
+   maxDigit = maxDigit - 1;
+	
+	
+
+   ListElement place = 0;
+   ListElement top_num = 0;
+   ListElement bottom_num = 0;
+
+	
+	int sp = 0;
+	
+   while (top.position() > 0 && bottom.position() > 0) {
+      top_num = top.movePrev();
+      bottom_num = bottom.movePrev();
+		
+		if (top_num < bottom_num) { // if we need to borrow
+			// borrow can't be true (i think) beneath bc 
+			if (top.peekPrev() == 0) { // if the number behind is 0 (so we cant borrow)
+				sp = top.position(); // remember what position needs to borrow
+				
+				while(top.movePrev() == 0){ // move backwards until we find a number we can borrow from
+					if(top.peekPrev() > 0){  // check after each move if the one behind is not 0 
+						break; // once found leave loop
+					}
+				}
+				top.setBefore( (top.peekPrev()) - 1); // decrement that one
+				
+				while(top.position() != sp) { // coming back to stack pointer
+					top.moveNext();
+					top.setBefore(radix - 1); // setting them to radix-1 like 9 or 99 or 999 because they were zero and r brwed from now
+				}
+				top_num = top_num + radix; // now were where we were at the beginning 
+				place = top_num - bottom_num;
+				C.insertBefore(place);
+         	C.movePrev();	
+				continue;
+			}else{
+				top.setBefore(top.peekPrev() - 1);
+				top_num = top_num + radix;
+				place = top_num - bottom_num;
+            C.insertBefore(place);
+            C.movePrev();
+				continue;
+			}
+		}else{
+			place = top_num - bottom_num;
+			C.insertBefore(place);
+			C.movePrev();
+		}
+	}
+
+	/*
+   while (top.position() > 0) {
+      top_num = top.movePrev();
+      if (carry) {
+         top_num = top_num + 1;
+      }
+
+      if (top_num > maxDigit) {
+         top_num = top_num % (maxDigit + 1);
+         carry = true;
+      }else{
+         carry = false;
+      }
+      C.insertBefore(top_num);
+      C.movePrev();
+   }
+	
+	while (bottom.position() > 0) {
+      bottom_num = bottom.movePrev();
+      if (carry) {
+         bottom_num = bottom_num + 1;
+      }
+
+      if (bottom_num > maxDigit) {
+         bottom_num = bottom_num % (maxDigit + 1);
+         carry = true;
+      }else{
+         carry = false;
+      }
+      C.insertBefore(bottom_num);
+      C.movePrev();
+   }
+	*/
+   return diff;
+	
+}
+/*
    // mult()
    // Returns a BigInteger representing the product of this and N. 
    BigInteger mult(const BigInteger& N) const;
