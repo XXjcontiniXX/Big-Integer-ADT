@@ -14,6 +14,8 @@ const int power = 9;
 
 const ListElement base = 10e9;
 
+void normalizeList(List& L);
+
 // BigInteger()
 // Constructor that creates a new BigInteger in the zero state: 
 // signum=0, digits=().
@@ -195,6 +197,21 @@ void BigInteger::negate() {
 // add()
 // Returns a BigInteger representing the sum of this and N.
 BigInteger BigInteger::add(const BigInteger& N) const {
+	bool negate = false;
+	
+	if (this->sign() == -1 && N.sign() == -1) {
+		negate = true;
+	}else if(this->sign() == -1 && N.sign() == 1) {
+		BigInteger bottom = BigInteger(*this);
+		bottom.negate();
+		return N.sub(bottom);
+	}else if(this->sign() == 1 && N.sign() == -1) {
+		BigInteger bottom = BigInteger(N);
+      bottom.negate();
+		
+      return this->sub(bottom);
+	}
+	
 	List top = List(this->digits);
 	List bottom = List(N.digits);
 	
@@ -211,81 +228,36 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 	List &C = sum.digits;
 	C.moveBack();
 
-
-	long radix = 1;
-	for (int i = 0; i < power; i += 1){
-            radix = radix * 10;
-   }
-	
-	
-	ListElement place = 0;
    ListElement top_num = 0;
    ListElement bottom_num = 0;
-
-	bool carry = false;
 
    while (top.position() > 0 && bottom.position() > 0) {
 		sum.signum = 1;
 		top_num = top.movePrev();
       bottom_num = bottom.movePrev();
-		
-		place = carry ? top_num + bottom_num + 1: top_num + bottom_num; // carry if carry == 1
-		
-		if ( place >= radix) {
-			carry = true;
-			place = place - radix; // normalize
-			C.insertBefore(place); // place it
-         C.movePrev();
-		}else{
-			carry = false;
-			C.insertBefore(place); // place it
-         C.movePrev();
-		}
-	
+		C.insertBefore(top_num + bottom_num); // place it
+      C.movePrev();
 	}
-	
-		
-	if (bottom.position() == 0 && top.position() == 0) {
-		if (carry) {
-			C.insertBefore(long(1));
-      	C.movePrev();
-		}
-		return sum;	
-	}
-	
 		
 	while (top.position() > 0) {
 		top_num = top.movePrev();
-		place = carry ? top_num + 1 : top_num;
-		
-		if (place >= radix) {
-			carry = true;
-			place = place - radix; // normalize
-			C.insertBefore(place); // place it
-         C.movePrev();
-		}else{
-			carry = false; // we dont need to borrow anymore
-			C.insertBefore(place); // no need to normalize
-      	C.movePrev();
-		}
+		C.insertBefore(top_num); // place it
+      C.movePrev();		
 	}
 
 	
 	while (bottom.position() > 0) {
-      bottom_num = bottom.movePrev();
-      place = carry ? bottom_num + 1 : bottom_num;
-
-      if (place >= radix) {
-         carry = true;
-         place = place - radix; // normalize
-         C.insertBefore(place); // place it
-         C.movePrev();
-      }else{
-         carry = false; // we dont need to borrow anymore
-         C.insertBefore(place); // no need to normalize
-         C.movePrev();
-      }
+		bottom_num = bottom.movePrev();
+		C.insertBefore(bottom_num); // place it
+      C.movePrev();
    }
+	//cout << "C add: before normalizing: " << C;
+	normalizeList(C);
+	//cout << "C add: after normalizinf: " << C;
+	if (negate) {
+		sum.negate();
+		return sum;
+	}
 	return sum;
 }
 
@@ -343,50 +315,31 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 	
 	long radix = 1;
    for (int i = 0; i < power; i += 1){
-            radix = radix * 10;
+   	radix = radix * 10;
    }
 
-   ListElement place = 0;
    ListElement top_num = 0;
    ListElement bottom_num = 0;
 	
-	bool borrow = false;
 	
 	while (top.position() > 0 && bottom.position() > 0) {
 		diff.signum = 1;
       top_num = top.movePrev();
       bottom_num = bottom.movePrev();
-
-      place = borrow ? top_num - bottom_num - 1: top_num - bottom_num; // carry if carry == 1
-
-      if (place < 0) {
-         borrow = true;
-         place = place + radix; // normalize
-         C.insertBefore(place); // place it
-         C.movePrev();
-      }else{
-         borrow = false;
-         C.insertBefore(place); // place it
-         C.movePrev();
-      }
-
+		if (top.position() == 0 && top_num - bottom_num == 0) { break; }
+		C.insertBefore(top_num - bottom_num); // place it
+      C.movePrev();
    }
 
 	while (top.position() > 0) {
       top_num = top.movePrev();
-      place = borrow ? top_num - 1 : top_num;
-
-      if (place < 0) {
-         borrow = true;
-         place = place + radix; // normalize
-         C.insertBefore(place); // place it
-         C.movePrev();
-      }else{
-         borrow = false; // we dont need to borrow anymore
-         C.insertBefore(place); // no need to normalize
-         C.movePrev();
-      }
+      C.insertBefore(top_num); // no need to normalize
+   	C.movePrev();
    }
+	//cout << "sub C: before normalizing: " << C;
+	normalizeList(C);
+	//cout << "sub C: after normalizing: " << C;
+
 
 	long check = 0;
    (diff.digits).moveBack();
@@ -407,20 +360,114 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 		return diff;	
 	}
 }
+
+// normalizeList() 
+// Performs carries from right to left (least to most significant  
+// digits), then returns the sign of the resulting integer. Used  
+// by add(), sub() and mult(). 
+void normalizeList(List& L) {
+	L.moveBack();
+	long radix = 1;
+   for (int i = 0; i < power; i += 1){
+      radix = radix * 10;
+   }
+
+	bool carry = false;
+	bool borrow = false;
+	ListElement place = 0;
+
+	while (L.position() != 0) {
+		if (carry) {
+			place = L.movePrev() + 1;
+		}
+		else if (borrow) {
+			place = L.movePrev() - 1;
+		}else{
+			place = L.movePrev();
+		}
+		
+
+		if (place >= radix) {
+			L.setAfter(place - radix);
+			carry = true;
+		}else if (place < 0) {
+			L.setAfter(place + radix);
+         borrow = true;
+		}else{
+			L.setAfter(place);
+			carry = false;
+			borrow = false;
+		}	
+	}
+}
+
+
+// mult()
+// Returns a BigInteger representing the product of this and N. 
+BigInteger BigInteger::mult(const BigInteger& N) const {
+	List top = List(this->digits);
+	List bottom = List(N.digits);
+	List tmp;
+	
+	BigInteger prod = BigInteger();
+	BigInteger sum = BigInteger();
+	List &s = sum.digits;
+
+	s.moveBack();
+	top.moveBack();
+	bottom.moveBack();
+	
+	long radix = 1;
+   for (int i = 0; i < power; i += 1){
+   	radix = radix * 10;
+   }
+	
+	long remainder = 0;
+	long new_remainder = 0;
+
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;
+	
+	long carry = 0;
+	while (bottom.position() != 0) { // iterate on the bottom digits // top digits times all the bottom digits
+		bottom_num = bottom.movePrev();
+		top.moveBack(); // start at the back of top every time
+		s.moveBack();  
+		
+		while (s.position() != bottom.position()) {
+			s.movePrev(); // move to the same column in s as it is in bottom 
+		}
+
+		while (top.position() != 0) { // iterate the top digits
+			top_num = top.movePrev() + carry;
+			carry = 0;
+			for (long i = 0; i < bottom_num; i += 1 ) {
+				new_remainder = (top_num + remainder) % radix;
+				if (new_remainder < remainder) {
+					carry += 1;
+				}
+				remainder = remainder + new_remainder;
+			}
+			//cout << remainder;
+			s.insertBefore(remainder);
+			s.movePrev();
+		}
+		cout << sum << "\n";
+		prod = prod + sum;
+	}
+	return prod;	
+	
+}
+
+
+// Other Functions ---------------------------------------------------------
 /*
-   // mult()
-   // Returns a BigInteger representing the product of this and N. 
-   BigInteger mult(const BigInteger& N) const;
-
-
-   // Other Functions ---------------------------------------------------------
-
-   // to_string()
-   // Returns a string representation of this BigInteger consisting of its
-   // base 10 digits. If this BigInteger is negative, the returned string 
-   // will begin with a negative sign '-'. If this BigInteger is zero, the
-   // returned string will consist of the character '0' only.
-   std::string to_string();
+// to_string()
+// Returns a string representation of this BigInteger consisting of its
+// base 10 digits. If this BigInteger is negative, the returned string 
+// will begin with a negative sign '-'. If this BigInteger is zero, the
+// returned string will consist of the character '0' only.
+std::string to_string();
 
 
    // Overriden Operators -----------------------------------------------------
@@ -434,11 +481,14 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 		stream << N.digits;
 		return stream;
 	}
-	/*
+	
    // operator==()
    // Returns true if and only if A equals B. 
-   friend bool operator==( const BigInteger& A, const BigInteger& B );
-
+   bool operator==( const BigInteger& A, const BigInteger& B ) {
+		return A.compare(B) == 0 ? true : false;
+	
+	}
+	/*
    // operator<()
    // Returns true if and only if A is less than B. 
    friend bool operator<( const BigInteger& A, const BigInteger& B );
@@ -454,11 +504,13 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
    // operator>=()
    // Returns true if and only if A is greater than or equal to B. 
    friend bool operator>=( const BigInteger& A, const BigInteger& B );
-
+	*/
    // operator+()
    // Returns the sum A+B. 
-   friend BigInteger operator+( const BigInteger& A, const BigInteger& B );
-
+   BigInteger operator+( const BigInteger& A, const BigInteger& B ) {
+		return A.add(B);
+	}
+	/*
    // operator+=()
    // Overwrites A with the sum A+B. 
    friend BigInteger operator+=( BigInteger& A, const BigInteger& B );
