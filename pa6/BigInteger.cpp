@@ -14,6 +14,8 @@ const int power = 9;
 
 const ListElement base = 10e9;
 
+void normalizeList(List& L);
+
 // BigInteger()
 // Constructor that creates a new BigInteger in the zero state: 
 // signum=0, digits=().
@@ -289,7 +291,40 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 	return sum;
 }
 
+void normalizeList(List& L) {
+	L.moveBack();
+	long radix = 1;
+   for (int i = 0; i < power; i += 1){
+      radix = radix * 10;
+   }
 
+	bool carry = false;
+	bool borrow = false;
+	ListElement place = 0;
+
+	while (L.position() != 0) {
+		if (carry) {
+			place = L.movePrev() + 1;
+		}
+		else if (borrow) {
+			place = L.movePrev() - 1;
+		}else{
+			place = L.movePrev();
+		}
+
+		if (place >= radix) {
+			L.setAfter(place - radix);
+			carry = true;
+		}else if (place < 0) {
+			L.setAfter(place + radix);
+         borrow = true;
+		}else{
+			L.setAfter(place);
+			carry = false;
+			borrow = false;
+		}	
+	}
+}
 // sub()
 // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const {
@@ -434,11 +469,13 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 		stream << N.digits;
 		return stream;
 	}
-	/*
+	
    // operator==()
    // Returns true if and only if A equals B. 
-   friend bool operator==( const BigInteger& A, const BigInteger& B );
-
+   bool operator==( const BigInteger& A, const BigInteger& B ) {
+		return A.compare(B) == 0 ? true : false;
+	}
+	/*
    // operator<()
    // Returns true if and only if A is less than B. 
    friend bool operator<( const BigInteger& A, const BigInteger& B );

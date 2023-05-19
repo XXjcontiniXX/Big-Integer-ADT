@@ -23,28 +23,54 @@ int main () {
 
 	// add tests //
 	cout << "\n\n\nBeginning add tests:\n";
-	BigInteger two = BigInteger("9999999999"); 
-	BigInteger one = BigInteger("1000000000000090000000000000");
+	BigInteger one = BigInteger("-9999999999"); 
+	BigInteger two = BigInteger("1000000000000090000000000000");
+	BigInteger twotwo = BigInteger("9999999999");
+	cout << twotwo << "+" << two << "-" << twotwo << "==" << twotwo.add(two.sub(twotwo)) << "\n";
 	cout << one;
+	cout << "two plus twotwo " << two.add(twotwo);
 	cout << '+' << '\n';
 	cout << two;
-	cout << "Addition: " << one.add(two) << "\n";
+	BigInteger fix = two.add(one);
+	cout << "Addition: " << fix << "\n";
+	cout << "fix: " << fix.add(one) << "\n"; 
 
 	cout << "\n\n\nBeginning subtract tests:\n";
 	
 	BigInteger four = BigInteger("1111111111111111111");
-	BigInteger three = BigInteger("111111111");	
+	BigInteger three = BigInteger("1111111111110000");	
 
 	
 	cout << three;
 	cout << '-' << '\n';
 	cout << four;
-	cout << "Subtraction: " << three.sub(four) << "\n";
+	BigInteger fourfour = three.sub(four);
+	cout << "Subtraction: " << fourfour << "\n";
+	cout << fourfour <<
 	
+
+	assert(three.sub(four).add(four) == three); 	
+
+	cout << "\n\n\nBeginning multiply tests:\n";
+
+   BigInteger five = BigInteger("100000000");
+   BigInteger six = BigInteger("100000000");
+
+
+   cout << five;
+   cout << '*' << '\n';
+   cout << six;
+//   cout << "Multiply: " << five.mult(six) << "\n";
 	//assert(smaller.sign() == 1);
 	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
-	
-	
+	/*cout << "\n\n\nseparate test\n";
+	BigInteger test = BigInteger("100000000");
+	BigInteger ans = BigInteger();
+	for(long i = 0 ; i < 100000000; i += 1) {
+		ans = ans + test;
+		cout << ans;
+	}
+	*/
 	//cout << 	N;
 	//BigInteger P = BigInteger(N);
 	
