@@ -17,7 +17,7 @@ private:
    // BigInteger Fields 
    int signum;    // +1 (positive), -1 (negative), 0 (zero)
    List digits;   // List of digits in this BigInteger
-
+	
 public:
 
    // Class Constructors & Destructors ----------------------------------------

@@ -26,7 +26,6 @@ int main () {
 	BigInteger one = BigInteger("-9999999999"); 
 	BigInteger two = BigInteger("1000000000000090000000000000");
 	BigInteger twotwo = BigInteger("9999999999");
-<<<<<<< HEAD
 	cout << twotwo << "+\n" << two << "-\n" << twotwo << "\n" << "= " << twotwo.add(two.sub(twotwo)) << "\n";
 	BigInteger fix = one.sub(two);
 	cout << "\n\n";
@@ -34,16 +33,6 @@ int main () {
 	cout << one << "-\n" << two << "=\n" << fix << "\n";
 	cout << "\n\n";
 	cout << fix << "+\n" << twotwo << "=\n" << fix.add(twotwo) << "\n"; 
-=======
-	cout << twotwo << "+" << two << "-" << twotwo << "==" << twotwo.add(two.sub(twotwo)) << "\n";
-	cout << one;
-	cout << "two plus twotwo " << two.add(twotwo);
-	cout << '+' << '\n';
-	cout << two;
-	BigInteger fix = two.add(one);
-	cout << "Addition: " << fix << "\n";
-	cout << "fix: " << fix.add(one) << "\n"; 
->>>>>>> caec651e5ba1250e1f9a84fe76c9a421e5ad302f
 
 	cout << "\n\n\nBeginning subtract tests:\n";
 	
@@ -55,18 +44,10 @@ int main () {
 	cout << '-' << '\n';
 	cout << four;
 	BigInteger fourfour = three.sub(four);
-<<<<<<< HEAD
    cout << "Subtraction: " << fourfour << "\n";
    cout << fourfour << "+\n" << four << "= \n" << four + fourfour; ///
 
 	//assert(three.sub(four).add(four) == three); 	
-=======
-	cout << "Subtraction: " << fourfour << "\n";
-	cout << fourfour <<
-	
-
-	assert(three.sub(four).add(four) == three); 	
->>>>>>> caec651e5ba1250e1f9a84fe76c9a421e5ad302f
 
 	cout << "\n\n\nBeginning multiply tests:\n";
 
@@ -77,7 +58,6 @@ int main () {
    cout << five;
    cout << '*' << '\n';
    cout << six;
-<<<<<<< HEAD
 	cout << "\n\n\n\n\n We are going to catch it here:\n";
 	BigInteger var1 = BigInteger("1000000000000090000000000000");
    BigInteger var2 = BigInteger("9999999999");
@@ -87,8 +67,6 @@ int main () {
 	cout << "= " << var3;
 	BigInteger var4 = var3.sub(var2);
 	cout << "\n" << var3 << "-\n" << var2 << "= " << var4 << "whereas it should equal: " << var1;
-=======
->>>>>>> caec651e5ba1250e1f9a84fe76c9a421e5ad302f
 //   cout << "Multiply: " << five.mult(six) << "\n";
 	//assert(smaller.sign() == 1);
 	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
