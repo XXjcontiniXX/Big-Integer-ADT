@@ -261,7 +261,40 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 	return sum;
 }
 
+void normalizeList(List& L) {
+	L.moveBack();
+	long radix = 1;
+   for (int i = 0; i < power; i += 1){
+      radix = radix * 10;
+   }
 
+	bool carry = false;
+	bool borrow = false;
+	ListElement place = 0;
+
+	while (L.position() != 0) {
+		if (carry) {
+			place = L.movePrev() + 1;
+		}
+		else if (borrow) {
+			place = L.movePrev() - 1;
+		}else{
+			place = L.movePrev();
+		}
+
+		if (place >= radix) {
+			L.setAfter(place - radix);
+			carry = true;
+		}else if (place < 0) {
+			L.setAfter(place + radix);
+         borrow = true;
+		}else{
+			L.setAfter(place);
+			carry = false;
+			borrow = false;
+		}	
+	}
+}
 // sub()
 // Returns a BigInteger representing the difference of this and N.
 BigInteger BigInteger::sub(const BigInteger& N) const {
@@ -486,7 +519,10 @@ std::string to_string();
    // Returns true if and only if A equals B. 
    bool operator==( const BigInteger& A, const BigInteger& B ) {
 		return A.compare(B) == 0 ? true : false;
+<<<<<<< HEAD
 	
+=======
+>>>>>>> caec651e5ba1250e1f9a84fe76c9a421e5ad302f
 	}
 	/*
    // operator<()
