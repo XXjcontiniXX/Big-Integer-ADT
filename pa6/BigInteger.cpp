@@ -15,6 +15,8 @@ const int power = 9;
 const ListElement base = 10e9;
 
 void normalizeList(List& L);
+void scalarMult(List& L, ListElement M);
+void shiftList(List& L, int p); 
 
 // BigInteger()
 // Constructor that creates a new BigInteger in the zero state: 
@@ -227,9 +229,23 @@ BigInteger BigInteger::add(const BigInteger& N) const {
 
 	List &C = sum.digits;
 	C.moveBack();
-
-   ListElement top_num = 0;
-   ListElement bottom_num = 0;
+	
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;
+	
+	if (this == std::addressof(N)) {
+		while(top.position() > 0) {
+			sum.signum = 1;
+			top_num = top.movePrev();
+			C.insertBefore(top_num + top_num);
+			C.movePrev();
+		}
+		normalizeList(C);
+		if (negate) {
+			sum.negate();
+		}
+		return sum;
+	}
 
    while (top.position() > 0 && bottom.position() > 0) {
 		sum.signum = 1;
@@ -401,60 +417,65 @@ void normalizeList(List& L) {
 	}
 }
 
+void scalarMult(List& L, ListElement m) {
+	if (m == 0) {
+		L.clear();
+		return;
+	}
+	BigInteger prod = BigInteger();
+	BigInteger add = BigInteger();
+	add.digits = L;
+	prod.digits = &L; 
+	for (ListElement i = 0; i < m; i += 1) {
+		 prod = prod + add;
+	}
+}
+
+void shiftList(List& L, int p) {
+	L.moveBack();
+	for (int i = 0; i < p; i += 1) {
+		L.insertAfter(0);
+		L.moveNext();
+	}
+	
+}
+
 
 // mult()
 // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const {
-	List top = List(this->digits);
-	List bottom = List(N.digits);
-	List tmp;
 	
+	
+	BigInteger top_int = BigInteger(*this);
+	BigInteger bottom_int = BigInteger(N);
+	List tmp;
+	// blah blah pick which is top
+	
+	// and which is bottom
+
 	BigInteger prod = BigInteger();
 	BigInteger sum = BigInteger();
 	List &s = sum.digits;
+	
+	List bottom = List(bottom_int.digits);
+	List top = List(top_int.digits);	
 
 	s.moveBack();
 	top.moveBack();
 	bottom.moveBack();
-	
-	long radix = 1;
-   for (int i = 0; i < power; i += 1){
-   	radix = radix * 10;
-   }
-	
-	long remainder = 0;
-	long new_remainder = 0;
 
-	ListElement top_num = 0;
-	ListElement bottom_num = 0;
-	
-	long carry = 0;
-	while (bottom.position() != 0) { // iterate on the bottom digits // top digits times all the bottom digits
-		bottom_num = bottom.movePrev();
-		top.moveBack(); // start at the back of top every time
-		s.moveBack();  
-		
-		while (s.position() != bottom.position()) {
-			s.movePrev(); // move to the same column in s as it is in bottom 
-		}
+	while (bottom.position() > 0) {
+		List top = List(top_int); // cache OG top
+		bottom_num = bottom.movePrev(); // get ur multiplier
+		scalarMult(top, bottom_num); // multiple the top bottom times || then save in top
+		shiftList(top, bottom.length() - bottom.position() + 1); // shift top 
 
-		while (top.position() != 0) { // iterate the top digits
-			top_num = top.movePrev() + carry;
-			carry = 0;
-			for (long i = 0; i < bottom_num; i += 1 ) {
-				new_remainder = (top_num + remainder) % radix;
-				if (new_remainder < remainder) {
-					carry += 1;
-				}
-				remainder = remainder + new_remainder;
-			}
-			//cout << remainder;
-			s.insertBefore(remainder);
-			s.movePrev();
-		}
-		cout << sum << "\n";
-		prod = prod + sum;
+		BigInteger top_tmp = BigInteger(); //
+		top_tmp.digits = top;				  // making a BigInteger for top	
+
+		prod = prod + top_tmp; // add top to prod
 	}
+	
 	return prod;	
 	
 }
@@ -470,24 +491,23 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 std::string to_string();
 
 
-   // Overriden Operators -----------------------------------------------------
-   */
-   // operator<<()
-   // Inserts string representation of N into stream.
-   std::ostream& operator<<( std::ostream& stream, BigInteger N ) {
-		if (N.signum != 0){
-			stream << (N.signum == 1 ? '+' : '-') << " ";
-		}
+// Overriden Operators -----------------------------------------------------
+*/
+// operator<<()
+// Inserts string representation of N into stream.
+std::ostream& operator<<( std::ostream& stream, BigInteger N ) {
+	if (N.signum != 0){
+		stream << (N.signum == 1 ? '+' : '-') << " ";
+	}
 		stream << N.digits;
 		return stream;
-	}
+}
 	
-   // operator==()
-   // Returns true if and only if A equals B. 
-   bool operator==( const BigInteger& A, const BigInteger& B ) {
-		return A.compare(B) == 0 ? true : false;
-	
-	}
+// operator==()
+// Returns true if and only if A equals B. 
+bool operator==( const BigInteger& A, const BigInteger& B ) {
+	return A.compare(B) == 0 ? true : false;	
+}
 	/*
    // operator<()
    // Returns true if and only if A is less than B. 

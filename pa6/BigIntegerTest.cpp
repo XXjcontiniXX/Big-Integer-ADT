@@ -67,7 +67,9 @@ int main () {
 	cout << "= " << var3;
 	BigInteger var4 = var3.sub(var2);
 	cout << "\n" << var3 << "-\n" << var2 << "= " << var4 << "whereas it should equal: " << var1;
-//   cout << "Multiply: " << five.mult(six) << "\n";
+	cout << "\n\n\n\n";
+	cout << var2 << "\n+\n" << var2 << "=\n" << var2 + var2;
+ 	cout << "Multiply: " << five.mult(six) << "\n";
 	//assert(smaller.sign() == 1);
 	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
 	/*cout << "\n\n\nseparate test\n";
