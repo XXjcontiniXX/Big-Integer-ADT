@@ -10,7 +10,7 @@
 using namespace std;
 // Class Constructors & Destructors ----------------------------------------
 
-const int power = 9;
+const extern int power = 9;
 
 const ListElement base = 10e9;
 
@@ -28,11 +28,19 @@ BigInteger::BigInteger() {
 
 // BigInteger()
 // Constructor that creates a new BigInteger from the long value x.
-BigInteger::BigInteger(long x) {
+BigInteger::BigInteger(long x) { // this doesnt work for base 10 or anything except for 1 billion
 	if (x == 0) {
 		signum = 0;
 	}
-	signum = x > 0 ? 1: 0;
+	if (x < 0) {
+		x = x * -1;
+		signum = -1;
+	}
+
+	if (x > 0) {
+		signum = 1;
+	}
+
 	digits = List();
 	digits.insertAfter(x);
 }
@@ -287,6 +295,12 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 	BigInteger bottom_int = BigInteger(N);
 	BigInteger diff = BigInteger();
 	BigInteger tmp;
+
+
+
+	/// MAKE CASES For when teyre the same number.
+
+
 	if (this->sign() == 0 && N.sign() == 0 ) {
       return diff;
    }
@@ -422,13 +436,26 @@ void scalarMult(List& L, ListElement m) {
 		L.clear();
 		return;
 	}
-	BigInteger prod = BigInteger();
-	BigInteger add = BigInteger();
-	add.digits = L;
-	prod.digits = &L; 
+	
+	List C = List(L);
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;
+	
 	for (ListElement i = 0; i < m; i += 1) {
-		 prod = prod + add;
+		L.moveBack();
+		C.moveBack();
+		while (C.position() > 0 && L.position() > 0) {
+      	top_num = L.movePrev();
+			bottom_num = C.peekPrev();
+      	C.insertBefore(top_num + bottom_num); // place it
+      	C.movePrev();
+   	}
+
+		// you actually have to rewrite all of add right here
+		normalizeList(C);
 	}
+	L = C;
+
 }
 
 void shiftList(List& L, int p) {
@@ -482,17 +509,33 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 
 
 // Other Functions ---------------------------------------------------------
-/*
+
 // to_string()
 // Returns a string representation of this BigInteger consisting of its
 // base 10 digits. If this BigInteger is negative, the returned string 
 // will begin with a negative sign '-'. If this BigInteger is zero, the
 // returned string will consist of the character '0' only.
-std::string to_string();
+std::string BigInteger::to_string() {
+	string s;
+	string ss;
+	long digit = 0;
+	List A = List(this->digits);	
+	A.moveBack();
+	while (A.position() > 0) {
+		digit = A.movePrev();
+		s = std::to_string(digit);
+		ss = s + ss;
+		cout << power - s.size() << "\n";
+		for (int i = 0; i < power - int(s.size()); i += 1) {
+			ss = "0" + ss;
+		}
+	}
+	return ss;
+}
 
 
 // Overriden Operators -----------------------------------------------------
-*/
+
 // operator<<()
 // Inserts string representation of N into stream.
 std::ostream& operator<<( std::ostream& stream, BigInteger N ) {
