@@ -558,7 +558,6 @@ void scalarMult(List& L, ListElement m) {
 	List C = List(L);
 	for (ListElement i = 1; i < m; i += 1) {
 		combineList(L, L, C, 1);
-		cout << L;
 	}
 
 }
