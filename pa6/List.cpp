@@ -1,6 +1,9 @@
 #include <iostream>
 #include "List.h"
 #include <stdexcept>
+#include <string>
+
+using namespace std;
 
 List::Node::Node(ListElement x) {
 	data = x;
@@ -378,19 +381,20 @@ List List::concat(const List& L) const {
 // separated sequence of elements, surrounded by parentheses.
 std::string List::to_string() const {
 	List::Node* N = (this->frontDummy)->next;
-   std::string s = "(";
-	
+   string s;	
+   string ss;
+   long digit = 0;
    while (N != this->backDummy) {
-      s += std::to_string(N->data);
-      N = N->next;
-		if (N != this->backDummy) {
-			s += ", ";
-		}else{
-			s+= ")";
-		}
+      digit = N->data;
+      s = std::to_string(digit);
+      ss = s + ss;
+      cout << 9 - s.size() << "\n";
+      for (int i = 0; i < 9 - int(s.size()); i += 1) {
+         ss = "0" + ss;
+      }
+		N = N->next;
    }
-   return s;
-
+   return ss;
 }
 
 // equals()

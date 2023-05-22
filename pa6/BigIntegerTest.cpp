@@ -51,13 +51,14 @@ int main () {
 
 	cout << "\n\n\nBeginning multiply tests:\n";
 
-   BigInteger five = BigInteger("100000000");
-   BigInteger six = BigInteger("100000000");
+   BigInteger five = BigInteger("10");
+   BigInteger six = BigInteger("-1000000000");
 
 
    cout << five;
    cout << '*' << '\n';
    cout << six;
+	/*
 	cout << "\n\n\n\n\n We are going to catch it here:\n";
 	BigInteger var1 = BigInteger("1000000000000090000000000000");
    BigInteger var2 = BigInteger("9999999999");
@@ -69,7 +70,11 @@ int main () {
 	cout << "\n" << var3 << "-\n" << var2 << "= " << var4 << "whereas it should equal: " << var1;
 	cout << "\n\n\n\n";
 	cout << var2 << "\n+\n" << var2 << "=\n" << var2 + var2;
- 	cout << "Multiply: " << five.mult(six) << "\n";
+ 	*/
+	cout << "Multiply: " << five.mult(six) << "\n";
+	//cout << var2 + var1;
+	//cout << (var1 + var2).to_string();
+
 	//assert(smaller.sign() == 1);
 	//cout << bigger.compare(smaller) << " this gotta be a -1 i think\n";
 	/*cout << "\n\n\nseparate test\n";

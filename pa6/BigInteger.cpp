@@ -343,11 +343,6 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
    List &C = diff.digits;
    C.moveBack();
 	
-	long radix = 1;
-   for (int i = 0; i < power; i += 1){
-   	radix = radix * 10;
-   }
-
    ListElement top_num = 0;
    ListElement bottom_num = 0;
 	
@@ -397,11 +392,6 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 // by add(), sub() and mult(). 
 void normalizeList(List& L) {
 	L.moveBack();
-	long radix = 1;
-   for (int i = 0; i < power; i += 1){
-      radix = radix * 10;
-   }
-
 	bool carry = false;
 	bool borrow = false;
 	ListElement place = 0;
@@ -417,11 +407,11 @@ void normalizeList(List& L) {
 		}
 		
 
-		if (place >= radix) {
-			L.setAfter(place - radix);
+		if (place >= base) {
+			L.setAfter(place - base);
 			carry = true;
 		}else if (place < 0) {
-			L.setAfter(place + radix);
+			L.setAfter(place + base);
          borrow = true;
 		}else{
 			L.setAfter(place);
@@ -429,7 +419,135 @@ void normalizeList(List& L) {
 			borrow = false;
 		}	
 	}
+	if (carry) { // Could be wrong fixes, issue with carry at the end.
+		L.insertBefore(1);
+	}
+
 }
+
+
+
+int compareList(List A, List B) { // returns 1 if A > B, 0 A == B, -1 A < B.
+	
+	int A_length = A.length();
+	int B_length = B.length();
+	A.moveFront();	
+
+	if (A_length > B_length) {
+		return 1;
+	}
+	if (A_length < B_length) {
+		return -1;
+	}
+	
+	ListElement A_val = 0;
+	ListElement B_val = 0;
+	
+	while (A.position() != A.length()) {
+		A_val = A.moveNext();
+		B_val = B.moveNext();	
+	
+		if (A_val > B_val) {
+			return 1;
+		}
+		if (A_val < B_val) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+
+void sumList(List& S, List A, List B) {
+	List sum = List();
+   sum.moveBack();
+   A.moveBack();
+   B.moveBack();
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;
+
+	while (A.position() > 0 && B.position() > 0) {
+      //s.signum = 1; rain check on this
+      top_num = A.movePrev();
+      bottom_num = B.movePrev();
+      sum.insertBefore(top_num + bottom_num); // place it
+      sum.movePrev();
+   }
+
+   while (A.position() > 0) {
+      top_num = A.movePrev();
+      sum.insertBefore(top_num); // place it
+      sum.movePrev();
+   }
+
+   while (B.position() > 0) {
+      bottom_num = B.movePrev();
+      sum.insertBefore(bottom_num); // place it
+      sum.movePrev();
+   }
+	normalizeList(sum);
+	S = List(sum);
+}
+
+
+void subList(List& S, List A, List B) {
+	List diff = List(); 
+	diff.moveBack();
+	A.moveBack();
+	B.moveBack();
+	ListElement top_num = 0;
+	ListElement bottom_num = 0;
+
+	while (A.position() > 0 && B.position() > 0) {
+   	//diff.signum = 1; idk if this is neccesarry
+      top_num = A.movePrev();
+      bottom_num = B.movePrev();
+      if (A.position() == 0 && top_num - bottom_num == 0) { break; }
+      diff.insertBefore(top_num - bottom_num); // place it
+      diff.movePrev();
+   }
+
+   while (A.position() > 0) {
+      top_num = A.movePrev();
+      diff.insertBefore(top_num); // no need to normalize
+      diff.movePrev();
+   }
+	normalizeList(diff);
+	S = List(diff);
+}
+
+void combineList(List& S, List A, List B, int sgn) {
+	List sum = List();
+	sum.moveBack();
+	A.moveBack();
+	B.moveBack();
+	
+	if (sgn == 1) {
+   	sumList(sum, A, B);	
+
+	}else if (sgn == -1) {
+		List top;
+		List bottom;	
+	
+		int opt = compareList(A, B);
+		if (opt == 1) {
+			subList(sum, A, B); // A - B makes sense
+		}
+		if (opt == -1) {
+			subList(sum, B, A); // since B has is larger itll do B - A
+		}
+		if (opt == 0) {
+			S = List(); // return empty List
+		}
+		
+	}else{
+		sum = List(A); // if B is zero we just have A
+	}
+
+	S = List(sum);
+}
+
+
 
 void scalarMult(List& L, ListElement m) {
 	if (m == 0) {
@@ -438,73 +556,78 @@ void scalarMult(List& L, ListElement m) {
 	}
 	
 	List C = List(L);
-	ListElement top_num = 0;
-	ListElement bottom_num = 0;
-	
-	for (ListElement i = 0; i < m; i += 1) {
-		L.moveBack();
-		C.moveBack();
-		while (C.position() > 0 && L.position() > 0) {
-      	top_num = L.movePrev();
-			bottom_num = C.peekPrev();
-      	C.insertBefore(top_num + bottom_num); // place it
-      	C.movePrev();
-   	}
-
-		// you actually have to rewrite all of add right here
-		normalizeList(C);
+	for (ListElement i = 1; i < m; i += 1) {
+		combineList(L, L, C, 1);
+		cout << L;
 	}
-	L = C;
 
 }
 
 void shiftList(List& L, int p) {
 	L.moveBack();
+	
 	for (int i = 0; i < p; i += 1) {
 		L.insertAfter(0);
 		L.moveNext();
 	}
-	
 }
-
 
 // mult()
 // Returns a BigInteger representing the product of this and N. 
 BigInteger BigInteger::mult(const BigInteger& N) const {
-	
+	BigInteger prod = BigInteger();
 	
 	BigInteger top_int = BigInteger(*this);
 	BigInteger bottom_int = BigInteger(N);
-	List tmp;
-	// blah blah pick which is top
+	List top;
+
+	bool neg = false;
 	
-	// and which is bottom
-
-	BigInteger prod = BigInteger();
-	BigInteger sum = BigInteger();
-	List &s = sum.digits;
-	
-	List bottom = List(bottom_int.digits);
-	List top = List(top_int.digits);	
-
-	s.moveBack();
-	top.moveBack();
-	bottom.moveBack();
-
-	while (bottom.position() > 0) {
-		List top = List(top_int); // cache OG top
-		bottom_num = bottom.movePrev(); // get ur multiplier
-		scalarMult(top, bottom_num); // multiple the top bottom times || then save in top
-		shiftList(top, bottom.length() - bottom.position() + 1); // shift top 
-
-		BigInteger top_tmp = BigInteger(); //
-		top_tmp.digits = top;				  // making a BigInteger for top	
-
-		prod = prod + top_tmp; // add top to prod
+	if (N.sign() == -1 && this->sign() == 1) {
+		neg = true;
 	}
 	
-	return prod;	
+	if (N.sign() == 1 && this->sign() == -1) {
+		neg = true;
+	}
 	
+	prod.signum = 1;
+	
+
+	List &p = prod.digits;
+	
+	List bottom = List(bottom_int.digits);
+	
+	bottom.moveBack();
+	ListElement bottom_num = 0;	
+	
+	while (bottom.position() > 0) {
+		top = List(top_int.digits); // cache OG top
+		bottom_num = bottom.movePrev(); // get ur multiplier
+		scalarMult(top, bottom_num); // multiple the top bottom times || then save in top
+		//cout << "new top: " << top << "\n";
+		//cout << "bottom length: " << bottom.length() << " minus bottom position: " << bottom.position() << " plus: " << 1 << "\n";
+		//cout << "so total is: " << bottom.length() - bottom.position() - 1 << "\n";
+		shiftList(top, bottom.length() - bottom.position() - 1); // shift top 
+		combineList(p, p, top, 1);	//this does the addition
+	}
+	
+	if (neg) {
+		prod.signum = -1;
+	}
+
+	long check = 0;
+   (prod.digits).moveBack();
+   while (check == 0 && (prod.digits).position() > 0) {
+      check += (prod.digits).movePrev();
+   }
+
+   if (check == 0) {
+      (prod.digits).clear();
+      prod.signum = 0;
+   }
+	
+	return prod;
 }
 
 
@@ -551,46 +674,69 @@ std::ostream& operator<<( std::ostream& stream, BigInteger N ) {
 bool operator==( const BigInteger& A, const BigInteger& B ) {
 	return A.compare(B) == 0 ? true : false;	
 }
-	/*
-   // operator<()
-   // Returns true if and only if A is less than B. 
-   friend bool operator<( const BigInteger& A, const BigInteger& B );
+	
+// operator<()
+// Returns true if and only if A is less than B. 
+bool operator<( const BigInteger& A, const BigInteger& B ) {
+	return A.compare(B) == -1 ? true : false;
+}
 
-   // operator<=()
-   // Returns true if and only if A is less than or equal to B. 
-   friend bool operator<=( const BigInteger& A, const BigInteger& B );
+// operator<=()
+// Returns true if and only if A is less than or equal to B. 
+bool operator<=( const BigInteger& A, const BigInteger& B ) {
+	return A.compare(B) <= 0 ? true : false;
+}
 
-   // operator>()
-   // Returns true if and only if A is greater than B. 
-   friend bool operator>( const BigInteger& A, const BigInteger& B );
+// operator>()
+// Returns true if and only if A is greater than B. 
+bool operator>( const BigInteger& A, const BigInteger& B ) {
+	return A.compare(B) == 1 ? true : false;
+}
 
-   // operator>=()
-   // Returns true if and only if A is greater than or equal to B. 
-   friend bool operator>=( const BigInteger& A, const BigInteger& B );
-	*/
-   // operator+()
-   // Returns the sum A+B. 
-   BigInteger operator+( const BigInteger& A, const BigInteger& B ) {
-		return A.add(B);
-	}
-	/*
-   // operator+=()
-   // Overwrites A with the sum A+B. 
-   friend BigInteger operator+=( BigInteger& A, const BigInteger& B );
+// operator>=()
+// Returns true if and only if A is greater than or equal to B. 
+bool operator>=( const BigInteger& A, const BigInteger& B ) {
+	return A.compare(B) >= 0 ? true : false;
+}
+	
+// operator+()
+// Returns the sum A+B. 
+BigInteger operator+( const BigInteger& A, const BigInteger& B ) {
+	return A.add(B);
+}
 
-   // operator-()
-   // Returns the difference A-B. 
-   friend BigInteger operator-( const BigInteger& A, const BigInteger& B );
+// operator+=()
+// Overwrites A with the sum A+B. 
+BigInteger operator+=( BigInteger& A, const BigInteger& B ) {
+	BigInteger A_tmp = BigInteger(A);
+	A = A_tmp + B;
+	return A;
+}
 
-   // operator-=()
-   // Overwrites A with the difference A-B. 
-   friend BigInteger operator-=( BigInteger& A, const BigInteger& B );
+// operator-()
+// Returns the difference A-B. 
+BigInteger operator-( const BigInteger& A, const BigInteger& B ) {
+   return A.sub(B);
+}
 
-   // operator*()
-   // Returns the product A*B. 
-   friend BigInteger operator*( const BigInteger& A, const BigInteger& B );
+// operator-=()
+// Overwrites A with the difference A-B. 
+BigInteger operator-=( BigInteger& A, const BigInteger& B ) {
+	BigInteger A_tmp = BigInteger(A);
+   A = A_tmp - B;
+   return A;
+}
 
-   // operator*=()
-   // Overwrites A with the product A*B. 
-   friend BigInteger operator*=( BigInteger& A, const BigInteger& B );
-*/
+// operator*()
+// Returns the product A*B. 
+BigInteger operator*( const BigInteger& A, const BigInteger& B ) {
+	return A.mult(B);
+}
+
+// operator*=()
+// Overwrites A with the product A*B. 
+BigInteger operator*=( BigInteger& A, const BigInteger& B ) {
+	BigInteger A_tmp = BigInteger(A);
+   A = A_tmp * B;
+   return A;
+}
