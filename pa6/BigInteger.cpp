@@ -678,7 +678,6 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 		//cout << "new top: " << top << "\n";
 		//cout << "bottom length: " << bottom.length() << " minus bottom position: " << bottom.position() << " plus: " << 1 << "\n";
 		//cout << "so total is: " << bottom.length() - bottom.position() - 1 << "\n";
-		cout << "hi\n";
 		shiftList(top, bottom.length() - bottom.position() - 1); // shift top 
 		combineList(p, p, top, 1);	//this does the addition
 	}
