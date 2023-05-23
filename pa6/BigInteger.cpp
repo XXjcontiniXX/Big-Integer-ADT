@@ -12,11 +12,13 @@ using namespace std;
 
 const extern int power = 9;
 
-const ListElement base = 10e9;
+const ListElement base = 1e9;
 
 void normalizeList(List& L);
 void scalarMult(List& L, ListElement M);
 void shiftList(List& L, int p); 
+string lstostr(List& L);
+List strtols(string s);
 
 // BigInteger()
 // Constructor that creates a new BigInteger in the zero state: 
@@ -35,7 +37,7 @@ BigInteger::BigInteger(long x) { // this doesnt work for base 10 or anything exc
 	if (x < 0) {
 		x = x * -1;
 		signum = -1;
-	}
+	} //////////////////// FIXXXX
 
 	if (x > 0) {
 		signum = 1;
@@ -392,11 +394,11 @@ BigInteger BigInteger::sub(const BigInteger& N) const {
 // by add(), sub() and mult(). 
 void normalizeList(List& L) {
 	L.moveBack();
-	bool carry = false;
+	int carry = false;
 	bool borrow = false;
 	ListElement place = 0;
 
-	while (L.position() != 0) {
+	while (L.position() > 0) {
 		if (carry) {
 			place = L.movePrev() + 1;
 		}
@@ -459,8 +461,7 @@ int compareList(List A, List B) { // returns 1 if A > B, 0 A == B, -1 A < B.
 
 
 void sumList(List& S, List A, List B) {
-	List sum = List();
-   sum.moveBack();
+   S.moveBack();
    A.moveBack();
    B.moveBack();
 	ListElement top_num = 0;
@@ -470,23 +471,22 @@ void sumList(List& S, List A, List B) {
       //s.signum = 1; rain check on this
       top_num = A.movePrev();
       bottom_num = B.movePrev();
-      sum.insertBefore(top_num + bottom_num); // place it
-      sum.movePrev();
+      S.insertBefore(top_num + bottom_num); // place it
+      S.movePrev();
    }
 
    while (A.position() > 0) {
       top_num = A.movePrev();
-      sum.insertBefore(top_num); // place it
-      sum.movePrev();
+      S.insertBefore(top_num); // place it
+      S.movePrev();
    }
 
    while (B.position() > 0) {
       bottom_num = B.movePrev();
-      sum.insertBefore(bottom_num); // place it
-      sum.movePrev();
+      S.insertBefore(bottom_num); // place it
+      S.movePrev();
    }
-	normalizeList(sum);
-	S = List(sum);
+	normalizeList(S);
 }
 
 
@@ -517,34 +517,41 @@ void subList(List& S, List A, List B) {
 }
 
 void combineList(List& S, List A, List B, int sgn) {
-	List sum = List();
-	sum.moveBack();
-	A.moveBack();
-	B.moveBack();
+	
+	List A_ = A;
+	List B_ = B;
+
+	S.clear();
+	
+
+	S.moveBack();
+	A_.moveBack();
+	B_.moveBack();
 	
 	if (sgn == 1) {
-   	sumList(sum, A, B);	
-
+   	sumList(S, A_, B_);
+		//S.moveBack();
+		//cout << "peekPrev(): " << S.peekPrev() << " Base: "  << base << "\n";
+   	//if (S.peekPrev() > base) {
+      //	cout << "error\n";
+   	//}	
 	}else if (sgn == -1) {
-		List top;
-		List bottom;	
 	
-		int opt = compareList(A, B);
+		int opt = compareList(A_, B_);
 		if (opt == 1) {
-			subList(sum, A, B); // A - B makes sense
+			subList(S, A_, B_); // A - B makes sense
 		}
 		if (opt == -1) {
-			subList(sum, B, A); // since B has is larger itll do B - A
+			subList(S, B_, A_); // since B has is larger itll do B - A
 		}
 		if (opt == 0) {
 			S = List(); // return empty List
 		}
 		
 	}else{
-		sum = List(A); // if B is zero we just have A
+		S = A_; //(////) // if B is zero we just have A
 	}
 
-	S = List(sum);
 }
 
 
@@ -555,12 +562,76 @@ void scalarMult(List& L, ListElement m) {
 		return;
 	}
 	
-	List C = List(L);
-	for (ListElement i = 1; i < m; i += 1) {
-		combineList(L, L, C, 1);
+	List M = List();
+	M.insertBefore(m);
+
+	L.moveBack();	
+
+	List prod = List();
+	while (L.position() > 0) { // for each ListElement digit
+		string digit = std::to_string( L.movePrev() );
+		List sum = List();
+		for (int i = digit.size() - 1; i >= 0; i -= 1) { // for each char in a ListElement digit
+			int chara = digit[i] - '0';
+			List sig_raw = List();
+			for(long j = 0; j < chara; j += 1) { // for the length of a char
+				combineList(sig_raw, sig_raw, M, 1); // add M to itself i.e. M * chara
+			}
+
+			string sig = lstostr(sig_raw);
+         for (int j = 0; j < (int)(digit.size()) - i - 1; j += 1) { // add 0s to it
+            sig = sig + '0';
+         }
+         combineList(sum, sum, strtols(sig), 1); // sum = sum + sig_raw
+		}
+		shiftList(sum, L.length() - L.position() - 1);
+		combineList(prod, prod, sum, 1);
+	}
+	L = prod;
+}
+
+
+
+List strtols(string s) {
+	List L = List();
+	L.moveFront();
+	int tmp = 0;
+	int element = 0;
+	for (int i = s.size()-1, j = 0; i >= 0; i -= 1, j += 1) { // starting at back
+      tmp = s[i] - 48;
+      for (int k = 0; k < j % power; k += 1){
+         tmp = tmp * 10;
+      }
+      element += tmp;
+      if ( j % power == power - 1) {
+         L.insertBefore(element);
+         L.movePrev();
+         element = 0;
+      }
 	}
 
+   if (element > 0) {
+      L.insertBefore(element);
+   }	
+	return L;
 }
+
+string lstostr(List& L) {
+	string s;
+   string ss;
+   long digit = 0;
+   L.moveBack();
+   while (L.position() > 0) {
+      digit = L.movePrev();
+      s = std::to_string(digit);
+      ss = s + ss;
+      for (int i = 0; i < power - int(s.size()); i += 1) {
+         ss = "0" + ss;
+      }
+   }
+   return ss;
+}
+
 
 void shiftList(List& L, int p) {
 	L.moveBack();
@@ -607,6 +678,7 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 		//cout << "new top: " << top << "\n";
 		//cout << "bottom length: " << bottom.length() << " minus bottom position: " << bottom.position() << " plus: " << 1 << "\n";
 		//cout << "so total is: " << bottom.length() - bottom.position() - 1 << "\n";
+		cout << "hi\n";
 		shiftList(top, bottom.length() - bottom.position() - 1); // shift top 
 		combineList(p, p, top, 1);	//this does the addition
 	}
@@ -647,7 +719,7 @@ std::string BigInteger::to_string() {
 		digit = A.movePrev();
 		s = std::to_string(digit);
 		ss = s + ss;
-		cout << power - s.size() << "\n";
+		//cout << power - s.size() << "\n";
 		for (int i = 0; i < power - int(s.size()); i += 1) {
 			ss = "0" + ss;
 		}
