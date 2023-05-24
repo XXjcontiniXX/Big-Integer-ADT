@@ -89,6 +89,18 @@ BigInteger::BigInteger(std::string s) {
 		check += digits.movePrev();
 	}
 	
+	long leading = 0;
+   digits.moveFront();
+   while (leading == 0 && digits.position() < digits.length()) {
+      leading = digits.moveNext();
+		if (leading > 0) {
+			break;
+		}else{
+			digits.eraseBefore();
+		}
+		
+   }
+	
 	if (check == 0) {
 		digits.clear();
 		signum = 0;
