@@ -499,7 +499,6 @@ void subList(List& S, List A, List B) {
 	ListElement bottom_num = 0;
 
 	while (A.position() > 0 && B.position() > 0) {
-   	//diff.signum = 1; idk if this is neccesarry
       top_num = A.movePrev();
       bottom_num = B.movePrev();
       if (A.position() == 0 && top_num - bottom_num == 0) { break; }
@@ -709,6 +708,10 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 // will begin with a negative sign '-'. If this BigInteger is zero, the
 // returned string will consist of the character '0' only.
 std::string BigInteger::to_string() {
+	if (this->signum == 0) {
+		return "0";
+	}
+
 	string s;
 	string ss;
 	long digit = 0;
@@ -719,6 +722,12 @@ std::string BigInteger::to_string() {
 		s = std::to_string(digit);
 		ss = s + ss;
 		//cout << power - s.size() << "\n";
+		if (A.position() == 0) {
+			if (this->signum == -1) {
+				ss = '-' + ss;
+			}
+			break;
+		}
 		for (int i = 0; i < power - int(s.size()); i += 1) {
 			ss = "0" + ss;
 		}
