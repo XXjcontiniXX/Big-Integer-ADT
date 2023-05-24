@@ -48,16 +48,53 @@ int main () {
    cout << fourfour << "+\n" << four << "= \n" << four + fourfour; ///
 
 	//assert(three.sub(four).add(four) == three); 	
-
+/*
 	cout << "\n\n\nBeginning multiply tests:\n";
+	BigInteger J = BigInteger("999999999");
+	BigInteger K = BigInteger("999999999");
 
-   BigInteger five = BigInteger("10");
-   BigInteger six = BigInteger("-1000000000");
+	cout << J.mult(K);
+*/	
 
 
-   cout << five;
-   cout << '*' << '\n';
-   cout << six;
+	BigInteger A5 = BigInteger();
+	BigInteger A6 = BigInteger();
+	BigInteger A7 = BigInteger();
+	BigInteger A8 = BigInteger();
+	BigInteger A9 = BigInteger();
+	BigInteger A10 = BigInteger();
+	BigInteger A11 = BigInteger();
+	BigInteger A12 = BigInteger();
+	BigInteger A13 = BigInteger();
+
+   BigInteger A_ = BigInteger("-41085449");
+	//BigInteger B_ = BigInteger("");
+	BigInteger A4 = ((A_ * A_) * (A_ * A_));
+
+	cout << endl << endl << "A_ = " << A_.to_string() << endl << endl;
+
+	cout << "A4 = A_^4 = " << A4.to_string() << endl << endl;
+	
+	A5 = A4 + A4;
+	A6 = A5 + A4;
+	A7 = A6 + A4;
+	A8 = A7 + A4;
+	A9 = A8 + A4;
+	A10 = A9 + A4;
+	A11 = A10 + A4;
+	A12 = A11 + A4;
+	cout << "A4 * 9 = " << A12.to_string() << endl;
+
+	
+	//BigInteger D = BigInteger("-12348148518469129628889");
+
+	//cout << "the prod is: "<< A_.mult(B_);
+
+	//assert (D == A_.mult(B_));
+
+   //cout << five;
+   //cout << '*' << '\n';
+   //cout << six;
 	/*
 	cout << "\n\n\n\n\n We are going to catch it here:\n";
 	BigInteger var1 = BigInteger("1000000000000090000000000000");
@@ -71,7 +108,7 @@ int main () {
 	cout << "\n\n\n\n";
 	cout << var2 << "\n+\n" << var2 << "=\n" << var2 + var2;
  	*/
-	cout << "Multiply: " << five.mult(six) << "\n";
+	//cout << "Multiply: " << five.mult(six) << "\n";
 	//cout << var2 + var1;
 	//cout << (var1 + var2).to_string();
 
