@@ -584,10 +584,20 @@ void scalarMult(List& L, ListElement m) {
 		sum.clear();
 		for (int i = digit.size() - 1; i >= 0; i -= 1) { // for each char in a ListElement digit
 			sig_raw.clear();
+			
+			if (digit[i] - '0' == 0) {
+				continue;
+			}
 			for(long j = 0; j < digit[i] - '0'; j += 1) { // for the length of a char
 				combineList(sig_raw, sig_raw, M, 1); // add M to itself i.e. M * chara
 			}
-
+			
+			
+			if (i == 8) {
+				combineList(sum, sum, sig_raw, 1);
+				continue;
+			}
+			
 			string sig = lstostr(sig_raw);
          for (int j = 0; j < (int)(digit.size()) - i - 1; j += 1) { // add 0s to it
             sig = sig + '0';
@@ -636,7 +646,10 @@ string lstostr(List& L) {
       s = std::to_string(digit);
       ss = s + ss;
       for (int i = 0; i < power - int(s.size()); i += 1) {
-         ss = "0" + ss;
+        	if (L.position() == 0) {
+				break;
+			}
+			ss = "0" + ss;
       }
    }
    return ss;
