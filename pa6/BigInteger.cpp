@@ -529,18 +529,16 @@ void subList(List& S, List A, List B) {
 
 void combineList(List& S, List A, List B, int sgn) {
 	
-	List A_ = A;
-	List B_ = B;
 
 	S.clear();
 	
 
 	S.moveBack();
-	A_.moveBack();
-	B_.moveBack();
+	A.moveBack();
+	B.moveBack();
 	
 	if (sgn == 1) {
-   	sumList(S, A_, B_);
+   	sumList(S, A, B);
 		//S.moveBack();
 		//cout << "peekPrev(): " << S.peekPrev() << " Base: "  << base << "\n";
    	//if (S.peekPrev() > base) {
@@ -548,19 +546,19 @@ void combineList(List& S, List A, List B, int sgn) {
    	//}	
 	}else if (sgn == -1) {
 	
-		int opt = compareList(A_, B_);
+		int opt = compareList(A, B);
 		if (opt == 1) {
-			subList(S, A_, B_); // A - B makes sense
+			subList(S, A, B); // A - B makes sense
 		}
 		if (opt == -1) {
-			subList(S, B_, A_); // since B has is larger itll do B - A
+			subList(S, B, A); // since B has is larger itll do B - A
 		}
 		if (opt == 0) {
 			S = List(); // return empty List
 		}
 		
 	}else{
-		S = A_; //(////) // if B is zero we just have A
+		S = A; //(////) // if B is zero we just have A
 	}
 
 }
@@ -579,13 +577,14 @@ void scalarMult(List& L, ListElement m) {
 	L.moveBack();	
 
 	List prod = List();
+	List sum = List();
+	List sig_raw;
 	while (L.position() > 0) { // for each ListElement digit
 		string digit = std::to_string( L.movePrev() );
-		List sum = List();
+		sum.clear();
 		for (int i = digit.size() - 1; i >= 0; i -= 1) { // for each char in a ListElement digit
-			int chara = digit[i] - '0';
-			List sig_raw = List();
-			for(long j = 0; j < chara; j += 1) { // for the length of a char
+			sig_raw.clear();
+			for(long j = 0; j < digit[i] - '0'; j += 1) { // for the length of a char
 				combineList(sig_raw, sig_raw, M, 1); // add M to itself i.e. M * chara
 			}
 
@@ -683,6 +682,7 @@ BigInteger BigInteger::mult(const BigInteger& N) const {
 	ListElement bottom_num = 0;	
 	
 	while (bottom.position() > 0) {
+		//cout << "how fast\n";
 		top = List(top_int.digits); // cache OG top
 		bottom_num = bottom.movePrev(); // get ur multiplier
 		scalarMult(top, bottom_num); // multiple the top bottom times || then save in top
