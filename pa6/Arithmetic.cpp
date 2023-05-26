@@ -1,13 +1,9 @@
-//-----------------------------------------------------------------------------
-// FileIO.cpp
-// Illustrates file input-output commands and text processing using the
-// string functions find_first_of(), find_first_not_of() and substr().
-// 
-// compile:
-//
-//      g++ -std=c++17 -Wall -o FileIO FileIO.cpp
-//
-//-----------------------------------------------------------------------------
+
+/*
+ * James Contini
+ * jcontini
+ * pa6
+ */
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -18,6 +14,7 @@ using namespace std;
 #define MAX_LEN 10000
 
 int main(int argc, char * argv[]){
+	long start = clock();
 
    int line_count;
    ifstream in;
@@ -103,7 +100,8 @@ int main(int argc, char * argv[]){
    // close files 
    in.close();
    out.close();
-
+	long end = clock();
+	cout << "it took " << end - start << "ticks, or " << ((float)end - start)/CLOCKS_PER_SEC << "seconds." << std::endl;
    return(EXIT_SUCCESS);
 }
 

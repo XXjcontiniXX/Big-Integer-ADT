@@ -1,6 +1,6 @@
 // James Contini
 // jcontini
-// Pa5
+// Pa6
 
 #include <iostream>
 #include"List.h"

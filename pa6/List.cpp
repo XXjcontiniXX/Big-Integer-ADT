@@ -1,3 +1,8 @@
+/*
+ * James Contini
+ * jcontini
+ * pa6
+ */
 #include <iostream>
 #include "List.h"
 #include <stdexcept>

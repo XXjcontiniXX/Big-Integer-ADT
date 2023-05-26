@@ -1,3 +1,8 @@
+/*
+ * James Contini
+ * jcontini
+ * pa6
+ */
 //-----------------------------------------------------------------------------
 // BigInteger.h
 // Header file for the BigInteger ADT

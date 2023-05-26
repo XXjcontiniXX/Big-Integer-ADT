@@ -1,3 +1,8 @@
+#
+# James Contini
+# jcontini
+# pa6
+
 #Makefile for CSE 101 Programming Assignment 6
 #
 #  make                     makes Arithmetic

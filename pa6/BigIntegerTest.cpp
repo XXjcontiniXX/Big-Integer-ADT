@@ -1,3 +1,8 @@
+/*
+jcontini
+pa6
+James Contini
+*/
 #include <iostream>
 #include <string>
 #include "BigInteger.h"
@@ -67,7 +72,8 @@ int main () {
 	BigInteger A12 = BigInteger();
 	BigInteger A13 = BigInteger();
 
-   BigInteger A_ = BigInteger("-41085449");
+	BigInteger A_ = BigInteger("123445");
+	cout << A_;
 	//BigInteger B_ = BigInteger("");
 	BigInteger A4 = ((A_ * A_) * (A_ * A_));
 
