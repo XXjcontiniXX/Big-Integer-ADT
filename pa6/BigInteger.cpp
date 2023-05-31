@@ -603,7 +603,15 @@ void scalarMult(List& L, ListElement m) {
 				continue;
 			}
 			
-			string sig = lstostr(sig_raw);
+			
+			sig_raw.moveBack();
+			string sig; 
+			//= lstostr(sig_raw);
+			while (sig_raw.position() > 0) {
+				sig = sig + std::to_string(sig_raw.movePrev());
+			}
+
+			cout << sig << endl;
          for (int j = 0; j < (int)(digit.size()) - i - 1; j += 1) { // add 0s to it
             sig = sig + '0';
          }
