@@ -32,6 +32,13 @@ private:
    int   num_pairs;
 
    // Helper Functions (Optional) ---------------------------------------------
+	
+	// translplant v into u
+	void Transplant(Node* u, Node* v);
+
+	// delete z
+	void Delete(Node* z);
+
 
    // inOrderString()
    // Appends a string representation of the tree rooted at R to string s. The

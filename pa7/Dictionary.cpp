@@ -12,6 +12,39 @@ using namespace std;
 		this->right = nullptr;
 	}
 
+	void Dictionary::Transplant(Node* u, Node* v) {
+   	if (u->parent == nil) {
+			this->root = v;
+   	}else if (u == u->parent->left) {
+      	u->parent->left = v;
+   	}else{ 
+      	u->parent->right = v;
+		}
+   	if (v != nullptr) {	
+      	v->parent = u->parent;
+		}
+
+	}
+
+	void Dictionary::Delete(Node* z) {
+   	if (z->left == nullptr) {               // case 1  or case 2.1 (right only)
+      	this->Transplant(z, z->right);
+   	} else if (z->right == nullptr) {         // case 2.2 (left only)
+      	this->Transplant(z, z->left);
+   	}else{                           // case 3
+     		Node* y = this->findMin(z->right);
+			this->Delete(y); // but now I've gotta delete it in the remove function
+
+      	if ( !(y->parent == z) ) {
+         	this->Transplant(y, y->right);
+         	y->right = z->right;
+         	y->right->parent = y;
+			}
+      	this->Transplant(z, y);
+      	y->left = z->left;
+      	y->left->parent = y;
+		}
+	}
    // inOrderString()
    // Appends a string representation of the tree rooted at R to string s. The
    // string appended consists of: "key : value \n" for each key-value pair in
@@ -64,24 +97,26 @@ using namespace std;
    // Searches the subtree rooted at R for a Node with key==k. Returns
    // the address of the Node if it exists, returns nil otherwise.
    Dictionary::Node* Dictionary::search(Node* R, keyType k) const {
-   	Node* x = R;
-   	while (x != nullptr) {
-      	if ( k.compare(x->key) < 0 ) { // use strcmp
-         	x = x->left;
-      	} else if ( k.compare(x->key) > 0 ) {
-         	x = x->right;
-			} else { 
-				return x;
-			}
+		//cout << R->key << endl;
+		if ( R == nullptr ) {
+			return nil;	
+		} else if ( k == R->key ) {
+			return R;
+   	}else if ( k.compare(R->key) < 0 ) {
+			return search(R->left, k);
+   	}else { // k > x.key
+			return search(R->right, k);
 		}
-		return nil;
 	}
 
    // findMin()
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // leftmost Node in that subtree, otherwise returns nil.
    Dictionary::Node* Dictionary::findMin(Node* R) {
-		Node * x = nil;
+		Node* x = R;
+		if (x == nullptr) {
+			return nil;
+		}
 		while (x->left != nullptr) {
       	x = x->left;
 		}
@@ -92,7 +127,10 @@ using namespace std;
    // If the subtree rooted at R is not empty, returns a pointer to the 
    // rightmost Node in that subtree, otherwise returns nil.
    Dictionary::Node* Dictionary::findMax(Node* R) {
-		Node * x = nil;
+		Node* x = R;
+      if (x == nullptr) {
+         return nil;
+      }
       while (x->right != nullptr) {
          x = x->right;
       }
@@ -104,23 +142,23 @@ using namespace std;
    // Node after N in an in-order tree walk.  If N points to the rightmost 
    // Node, or is nil, returns nil. 
    Dictionary::Node* Dictionary::findNext(Node* N) {
-		if (N != nullptr) {
-			if (N->right != nullptr) {
-				return N->right;
-			}
-
-			Node* x = nullptr;
-			Node* y = N;
-			while ( y->parent != nullptr) { // 
-				x = y->parent;					  // y is child of x
-				if (x->left == y) { 			  // if x's left child is y
-					return x;					  // return x
-				}
-				y = x;
-			}
+		Node* x = N;
+		
+		if (x == nil || x == nullptr) {
+			return nil;
 		}
-		return nullptr;
-	}
+		
+		if ( !(x->right == nullptr) ) {
+			return this->findMin(x->right);
+		}
+		Node* y = x->parent;
+
+		while ( !(y == nil) && y->right == x) { 
+			x = y;
+			y = y->parent;
+		}
+		return y;
+}
 	
 
    // findPrev()
@@ -128,23 +166,23 @@ using namespace std;
    // Node before N in an in-order tree walk.  If N points to the leftmost 
    // Node, or is nil, returns nil.
    Dictionary::Node* Dictionary::findPrev(Node* N) {
-	if (N != nullptr) {
-         if (N->left != nullptr) {
-            return N->left;
-         }
+   	Node* x = N;
 
-         Node* x = nullptr;
-         Node* y = N;
-         while ( y->parent != nullptr) { //
-            x = y->parent;               // y is child of x
-            if (x->right == y) {          // if x's right child is y
-               return x;                 // return x
-            }
-            y = x;
-         }
+      if (x == nil || x == nullptr) {
+         return nil;
       }
-		return nullptr;
-   }
+
+      if ( !(x->left == nullptr) ) {
+         return this->findMax(x->left);
+      }
+      Node* y = x->parent;
+
+      while ( !(y == nil) && y->left == x) {
+         x = y;
+         y = y->parent;
+      }
+      return y;
+	}
 
 
    // Class Constructors & Destructors ----------------------------------------
@@ -155,7 +193,7 @@ using namespace std;
 		nil->left = root;
 		nil->right = root;
 		root = nullptr;
-		current = nullptr;
+		current = nil;
 		num_pairs = 0;
 	}
 
@@ -165,7 +203,7 @@ using namespace std;
 		nil->left = root;
       nil->right = root;
 		root = nullptr;
-		current = nullptr;
+		current = nil;
 		this->preOrderCopy(D.root, nullptr);
 		num_pairs = D.num_pairs;
 	}
@@ -196,7 +234,7 @@ using namespace std;
    // Pre: contains(k)
    valType& Dictionary::getValue(keyType k) const {
 		if ( !this->contains(k) ) {
-			cout << "throw an error\n";
+			throw std::invalid_argument("Dictionary Error: Calling getValue() when key doesn't exist.");
 		}
 		return (search(this->root, k))->val;	
 	}
@@ -212,8 +250,8 @@ using namespace std;
    // Returns the current key.
    // Pre: hasCurrent() 
    keyType Dictionary::currentKey() const {
-		if ( !hasCurrent() ) {
-			cout << "no current throw error\n";
+		if ( hasCurrent() == false ) {
+			throw std::invalid_argument("Dictionary Error: Calling currentKey() when current doesn't exist.");
 		}
 		return current->key;
 	}
@@ -223,7 +261,7 @@ using namespace std;
    // Pre: hasCurrent()
    valType& Dictionary::currentVal() const {
 		if ( !hasCurrent() ) {
-         cout << "no current throw an error\n";
+         throw std::invalid_argument("Dictionary Error: Calling currentVal() when current doesn't exist.");
       }
       return current->val;
 	}
@@ -235,7 +273,7 @@ using namespace std;
    // Resets this Dictionary to the empty state, containing no pairs.
    void Dictionary::clear() {
 		postOrderDelete(this->root);
-		current = nullptr;
+		current = nil;
 		root = nullptr;
 	}
 
@@ -262,6 +300,8 @@ using namespace std;
          if (y == nullptr) {
             this->root = z;    // tree T was empty
 				this->root->parent = nil;
+				nil->right = this->root;
+				nil->left = this->root;
 				this->num_pairs += 1;
          } else if ( k.compare(y->key) < 0 ) {
 				if (y->left == nullptr) { this->num_pairs += 1;}
@@ -278,18 +318,20 @@ using namespace std;
    // becomes undefined.
    // Pre: contains(k).
    void Dictionary::remove(keyType k) {
-		if ( !contains(k) ) {
-			cout << "throw a mf error\n";
-		}
-	
-		Node* cur = search(this->root, k);
-
-		if ( cur == current ) {
-			delete current;
-			current = nullptr;
+		Node* target = search(this->root, k);
+		if ( target == nil) {
+			throw std::invalid_argument("Dictionary Error: Calling remove() when k doesn't exist.");
+		}	
+		
+		if ( target == this->current ) {
+			this->Delete(current);
+			delete target;
+			current = nil;
 			return;
 		}
-		delete cur;
+
+		this->Delete(target);
+		delete target;
 		return;
 	}
 
@@ -297,14 +339,19 @@ using namespace std;
    // If non-empty, places current iterator at the first (key, value) pair
    // (as defined by the order operator < on keys), otherwise does nothing. 
    void Dictionary::begin() {
-		current = nil->right;
+		if ( this->size() > 0 ) {
+			current = findMin(this->root);
+		}
+
 	}
 
    // end()
    // If non-empty, places current iterator at the last (key, value) pair
    // (as defined by the order operator < on keys), otherwise does nothing. 
    void Dictionary::end() {
-		current = findMax(this->root);
+		if ( this->size() > 0 ) {
+         current = findMax(this->root);
+      }
 	}
 
    // next()
@@ -314,7 +361,7 @@ using namespace std;
    // Pre: hasCurrent()
    void Dictionary::next() {
 		if ( !hasCurrent() ) {
-			cout << "throw error\n";
+			throw std::invalid_argument("Dictionary Error: Calling next() when current doesn't exist.");
 		}
 		current = findNext(current);
 	}
@@ -326,8 +373,8 @@ using namespace std;
    // Pre: hasCurrent()
    void Dictionary::prev() {
 	if ( !hasCurrent() ) {
-         cout << "throw error\n";
-      }
+      	throw std::invalid_argument("Dictionary Error: Calling prev() when k doesn't exist.");
+		}
       current = findPrev(current);
 	}
 
@@ -362,14 +409,9 @@ using namespace std;
 		if (D.size() != this->size()) {
 			return false;
 		}
-		string s;
-		this->inOrderString(s, this->root);
-		for (unsigned long i = 0; i < s.size(); i += 1) {
-			string l;
-			l += s[i];
-			if ( D.contains( l ) == false) {
-				return false;
-			}
+		
+		if ( (D.to_string()).compare(this->to_string()) != 0 ) {	
+			return false;
 		}
 		return true;
 	}
@@ -380,11 +422,7 @@ using namespace std;
    // Inserts string representation of Dictionary D into stream, as defined by
    // member function to_string().
    std::ostream& operator<<( std::ostream& stream, Dictionary& D ) {
-		string s;
-		D.Dictionary::preOrderString(s, D.root);
-		
-		return stream << s;
-		;
+		return stream << D.to_string();
 	}
 
    // operator==()
