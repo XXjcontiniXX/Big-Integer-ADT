@@ -110,10 +110,7 @@ int main(){
    // check state of A
    cout << "A.size() = " << A.size() << endl  << A << endl;
    cout << A.pre_string() << endl;
-	
 
-	//
-	
    // do forward iteration on A
    for(A.begin(); A.hasCurrent(); A.next()){
       s = A.currentKey();
@@ -121,6 +118,7 @@ int main(){
       cout << "("+s+", " << x << ") ";
    }
    cout << endl << endl;
+
    // do reverse iteration on A
    for(A.end(); A.hasCurrent(); A.prev()){
       s = A.currentKey();
@@ -128,6 +126,7 @@ int main(){
       cout << "("+s+", " << x << ") ";
    }
    cout << endl << endl;
+   
    // check exceptions
    try{
       A.getValue("blah");

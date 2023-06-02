@@ -27,14 +27,12 @@ using namespace std;
 	}
 
 	void Dictionary::Delete(Node* z) {
-   	if (z->left == nullptr) {               // case 1  or case 2.1 (right only)
+   	if (z->left == nullptr) {                 // case 1  or case 2.1 (right only)
       	this->Transplant(z, z->right);
    	} else if (z->right == nullptr) {         // case 2.2 (left only)
       	this->Transplant(z, z->left);
-   	}else{                           // case 3
+   	}else{                           			// case 3
      		Node* y = this->findMin(z->right);
-			this->Delete(y); // but now I've gotta delete it in the remove function
-
       	if ( !(y->parent == z) ) {
          	this->Transplant(y, y->right);
          	y->right = z->right;
@@ -91,6 +89,7 @@ using namespace std;
          postOrderDelete(R->right);
 			delete R;
       }
+		num_pairs = 0;
 	}
 
    // search()
@@ -318,20 +317,25 @@ using namespace std;
    // becomes undefined.
    // Pre: contains(k).
    void Dictionary::remove(keyType k) {
+		//cout << "call\n";
 		Node* target = search(this->root, k);
-		if ( target == nil) {
-			throw std::invalid_argument("Dictionary Error: Calling remove() when k doesn't exist.");
+		cout << "removing " << target->key << endl;
+		if ( target == nil ) {
+			throw std::invalid_argument("Dictionary Error: Calling remove() when key: " + k + " doesn't exist.");
 		}	
 		
 		if ( target == this->current ) {
 			this->Delete(current);
 			delete target;
 			current = nil;
+			num_pairs -= 1;
 			return;
 		}
 
 		this->Delete(target);
 		delete target;
+		num_pairs -= 1;
+		//cout << "this better happen once\n";
 		return;
 	}
 
