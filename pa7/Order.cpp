@@ -44,7 +44,10 @@ int main(int argc, char * argv[]){
 
    while( getline(in, line) )  {
 		line_count += 1;
-		line.pop_back();
+		char p = line.back();
+		if (p < 97 || p > 122) {
+			line.pop_back();
+		}
 
 		A.setValue(line, line_count);
 	}
