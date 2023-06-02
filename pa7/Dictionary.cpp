@@ -317,9 +317,7 @@ using namespace std;
    // becomes undefined.
    // Pre: contains(k).
    void Dictionary::remove(keyType k) {
-		//cout << "call\n";
 		Node* target = search(this->root, k);
-		cout << "removing " << target->key << endl;
 		if ( target == nil ) {
 			throw std::invalid_argument("Dictionary Error: Calling remove() when key: " + k + " doesn't exist.");
 		}	
