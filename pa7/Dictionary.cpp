@@ -1,3 +1,9 @@
+/*
+James Contini
+jcontini
+pa7
+*/
+
 #include<iostream>
 #include<string>
 #include"Dictionary.h"
@@ -209,6 +215,7 @@ using namespace std;
 
    // Destructor
    Dictionary::~Dictionary() {
+		delete nil;
 		postOrderDelete(this->root);
 	}
 

@@ -1,3 +1,9 @@
+/*
+James Contini
+jcontini
+pa7
+*/
+
 #include<iostream>
 #include<string>
 

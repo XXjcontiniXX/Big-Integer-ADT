@@ -1,7 +1,12 @@
+#James Contini
+#jcontini
+#pa7
+
+
 # Makefile for CSE 101 Programming Assignment 7
 #
 #  make                     makes Order
-#  make DictionaryClient    makes DictionaryClient
+#  make DictionaryTest      makes DictionaryTest
 #  make clean               removes all binaries
 #  make OrderCheck          runs Order under valgrind on in5 junk5
 #  make DictionaryCheck     runs DictionaryClient under valgrind
