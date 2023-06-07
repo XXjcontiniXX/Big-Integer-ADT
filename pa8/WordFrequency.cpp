@@ -25,7 +25,7 @@ int main(int argc, char * argv[]){
    string line;
    string tokenBuffer;
    string token;
-   string delim = " \t\\\"\',<.>/?;:[{]}|`~!@#$^&*()-_=+0123456789";
+   string delim = " \t\\\"\',<.>/?;:[{]}|`~!@#$^&*()-_=+0123456789%";
 
    // check command line for correct number of arguments
    if( argc != 3 ){
@@ -60,10 +60,12 @@ int main(int argc, char * argv[]){
       begin = min(line.find_first_not_of(delim, 0), len);
       end   = min(line.find_first_of(delim, begin), len);
       token = line.substr(begin, end-begin);
-		 
+		
       while( token!="" ){  // we have a token
-         // update token buffer
-         if (A.contains(token)) {
+         for (unsigned long i = 0; i < token.length(); i += 1) {
+				token[i] = tolower(token[i]);
+			}
+			if (A.contains(token)) {
 				A.getValue(token) += 1;	
 			}else{
 				A.setValue(token, 1);
@@ -87,7 +89,7 @@ int main(int argc, char * argv[]){
 	// print dictionaries??
 	out << A.to_string();
 	out << endl;
-	out << A.pre_string(); 
+	//out << A.pre_string(); 
 
    // close files 
    in.close();
