@@ -3,10 +3,13 @@
  * jcontini
  * pa7
  */
-#include<iostream>
 #include<fstream>
+#include<iostream>
 #include<string>
+#include<stdexcept>
 #include"Dictionary.h"
+using namespace std;
+
 
 using namespace std;
 
@@ -45,7 +48,7 @@ int main(int argc, char * argv[]){
    while( getline(in, line) )  {
 		line_count += 1;
 		char p = line.back();
-		if (p < 97 || p > 122) {
+		if ( p < 32 || p > 126 ) {
 			line.pop_back();
 		}
 
