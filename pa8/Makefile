@@ -47,7 +47,7 @@ $(ADT_OBJECT): $(ADT_SOURCE) $(ADT_HEADER)
 	$(COMPILE) $(ADT_SOURCE)
 
 clean:
-	$(REMOVE) $(MAIN) $(ADT_TEST) $(OBJECT) $(ADT_TEST).o $(ADT_OBJECT)
+	$(REMOVE) $(MAIN) $(ADT_TEST) $(ORDER) *.o
 
 $(MAIN)Check: $(MAIN)
 	$(MEMCHECK) $(MAIN) Gutenberg myGutenberg-out
