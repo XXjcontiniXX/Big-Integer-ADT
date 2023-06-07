@@ -24,7 +24,7 @@ using namespace std;
    // Appends a string representation of the tree rooted at R to string s. The
    // string appended consists of: "key : value \n" for each key-value pair in
    // tree R, arranged in order by keys.
-   void Dictionary::inOrderString(std::string& s, Node* R) const {
+   void Dictionary::inOrderString(string& s, Node* R) const {
 		if ( R != nil && R != nullptr ) {
 			inOrderString(s, R->left);
 			string k = R->key;
@@ -40,7 +40,7 @@ using namespace std;
    // tree walk. The keys stored in black Nodes will be appended as "key\n", and
    // the keys stored in red Nodes will be appended as "key (RED)\n". The output 
    // of this function is demonstrated in /Examples/pa8/DictionaryClient-out.  
-   void Dictionary::preOrderString(std::string& s, Node* R) const {
+   void Dictionary::preOrderString(string& s, Node* R) const {
 		if ( R != nil && R != nullptr ) {
 			if (R->color != 1) {
 				s += R->key + "\n";

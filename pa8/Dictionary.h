@@ -1,3 +1,10 @@
+/*
+James Contini
+jcontini
+pa8
+*/
+
+
 //-----------------------------------------------------------------------------
 // Dictionary.h
 // Header file for Dictionary ADT based on a Red-Black Tree. Includes a
