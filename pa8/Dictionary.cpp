@@ -413,8 +413,10 @@ using namespace std;
 		nil->parent = nullptr;
 		root = nullptr;
 		current = nil;
-		this->preOrderCopy(D.root, D.nil);
-		num_pairs = D.num_pairs;
+		if (D.size() != 0) {
+			this->preOrderCopy(D.root, D.nil);
+			num_pairs = D.num_pairs;
+		}
 	}
 
    // Destructor
@@ -653,8 +655,10 @@ using namespace std;
    // reference to this Dictionary.
    Dictionary& Dictionary::operator=( const Dictionary& D ) {
 		this->clear();
-		this->preOrderCopy(D.root, D.nil);
-		this->num_pairs = D.num_pairs;
+		if (D.size() != 0) { 
+			this->preOrderCopy(D.root, D.nil);
+			this->num_pairs = D.num_pairs;
+		}
 		return *this;
 
 	}
