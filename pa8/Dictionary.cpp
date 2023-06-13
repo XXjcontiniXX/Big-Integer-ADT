@@ -43,11 +43,9 @@ using namespace std;
    void Dictionary::preOrderString(string& s, Node* R) const {
 		if ( R != nil && R != nullptr ) {
 			if (R->color != 1) {
-				string k = R->key;
-				s += k + "\n";
+				s += R->key + "\n";
 			}else{
-				string k = R->key;
-				s += k + " (RED)" + "\n";
+				s += R->key + " (RED)" + "\n";
 			}
 			preOrderString(s, R->left);
 			preOrderString(s, R->right);
